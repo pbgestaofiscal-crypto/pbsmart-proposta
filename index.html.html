@@ -1,0 +1,1985 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Diagnóstico Tributário — Proposta de Consultoria</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+<style>
+:root{
+  --bg:#0a0e1a;--bg2:#0f1526;--bg3:#161d35;--border:#1e2a4a;
+  --accent:#00e5ff;--accent2:#7b61ff;--gold:#C9A84C;--gold2:#E8C96A;
+  --warn:#ff6b35;--text:#e8edf8;--text2:#8899bb;--text3:#4a5a7a;
+  --card:#111827;--green:#00ff9d;--red:#ff4757;--yellow:#ffd32a;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%;overflow:hidden}
+body{background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif}
+body::before{content:'';position:fixed;inset:0;background:
+  radial-gradient(ellipse at 15% 10%,rgba(0,229,255,.05) 0%,transparent 55%),
+  radial-gradient(ellipse at 85% 85%,rgba(123,97,255,.05) 0%,transparent 55%);
+  pointer-events:none;z-index:0}
+
+/* SLIDES */
+.wrap{position:relative;width:100%;height:100vh;overflow:hidden;z-index:1}
+.slide{position:absolute;inset:0;display:flex;flex-direction:column;opacity:0;pointer-events:none;
+  transition:opacity .45s ease,transform .45s ease;transform:translateX(50px)}
+.slide.active{opacity:1;pointer-events:all;transform:translateX(0)}
+.slide.out{opacity:0;transform:translateX(-50px)}
+.slide-inner{padding:44px 60px 76px;overflow-y:auto;height:100%}
+.slide-inner::-webkit-scrollbar{width:5px}
+.slide-inner::-webkit-scrollbar-thumb{background:var(--border);border-radius:3px}
+
+/* TIMER */
+.timer-bar{height:3px;background:var(--border);position:fixed;top:0;left:0;right:0;z-index:300}
+.timer-fill{height:100%;background:linear-gradient(90deg,var(--gold),var(--accent));width:0%;transition:width .12s linear}
+
+/* NAVBAR */
+.navbar{position:fixed;bottom:0;left:0;right:0;z-index:200;
+  background:rgba(10,14,26,.96);border-top:1px solid var(--border);
+  padding:12px 36px;display:flex;align-items:center;justify-content:space-between;
+  backdrop-filter:blur(12px)}
+.nb-left{display:flex;align-items:center;gap:14px}
+.nb-brand{font-family:'Syne',sans-serif;font-weight:800;font-size:.82rem;
+  background:linear-gradient(135deg,var(--gold),var(--gold2));
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.nb-counter{font-family:'DM Mono',monospace;font-size:.68rem;color:var(--text3)}
+.dots{display:flex;gap:7px;align-items:center}
+.dot{width:7px;height:7px;border-radius:50%;background:var(--border);cursor:pointer;transition:all .3s}
+.dot.active{background:var(--gold);width:22px;border-radius:3px}
+.dot.done{background:rgba(201,168,76,.35)}
+.nb-btns{display:flex;gap:8px}
+.btn{display:inline-flex;align-items:center;gap:7px;padding:9px 20px;border-radius:8px;
+  font-family:'Syne',sans-serif;font-weight:700;font-size:.82rem;cursor:pointer;
+  border:none;transition:all .2s;letter-spacing:.02em;white-space:nowrap}
+.btn-gold{background:linear-gradient(135deg,var(--gold),var(--gold2));color:#000}
+.btn-gold:hover{opacity:.88;transform:translateY(-1px)}
+.btn-outline{background:transparent;border:1px solid var(--border);color:var(--text2)}
+.btn-outline:hover{border-color:var(--accent);color:var(--accent)}
+.btn-ghost{background:transparent;border:1px solid rgba(201,168,76,.25);color:var(--gold);font-size:.72rem;padding:7px 12px}
+.btn-ghost:hover{background:rgba(201,168,76,.08)}
+.btn-red{background:rgba(255,71,87,.12);border:1px solid rgba(255,71,87,.3);color:var(--red)}
+.btn-red:hover{background:rgba(255,71,87,.22)}
+
+/* LABELS */
+.lbl{display:inline-flex;align-items:center;gap:6px;padding:4px 13px;border-radius:20px;
+  font-size:.65rem;font-family:'DM Mono',monospace;font-weight:600;letter-spacing:.08em;
+  text-transform:uppercase;margin-bottom:18px}
+.lbl-gold{background:rgba(201,168,76,.1);border:1px solid rgba(201,168,76,.25);color:var(--gold)}
+.lbl-red{background:rgba(255,71,87,.08);border:1px solid rgba(255,71,87,.25);color:var(--red)}
+.lbl-green{background:rgba(0,255,157,.08);border:1px solid rgba(0,255,157,.25);color:var(--green)}
+.lbl-blue{background:rgba(0,229,255,.08);border:1px solid rgba(0,229,255,.25);color:var(--accent)}
+
+/* TITLES */
+.h1{font-family:'Syne',sans-serif;font-weight:800;font-size:2rem;color:var(--text);line-height:1.15;margin-bottom:6px}
+.h2{font-family:'Syne',sans-serif;font-weight:800;font-size:1.5rem;color:var(--text);line-height:1.2;margin-bottom:6px}
+.sub{font-size:.92rem;color:var(--text2);line-height:1.55;margin-bottom:24px}
+
+/* CARDS */
+.card{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:20px}
+.card-gold{background:linear-gradient(135deg,rgba(201,168,76,.07),rgba(0,229,255,.03));border-color:rgba(201,168,76,.25)}
+.card-red{background:rgba(255,71,87,.05);border-color:rgba(255,71,87,.2)}
+.card-green{background:rgba(0,255,157,.05);border-color:rgba(0,255,157,.2)}
+.card-blue{background:rgba(0,229,255,.05);border-color:rgba(0,229,255,.15)}
+
+/* GRID */
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.g3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px}
+.g4{display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:12px}
+
+/* TAGS */
+.tag{display:inline-block;padding:2px 9px;border-radius:12px;font-size:.65rem;font-family:'DM Mono',monospace;font-weight:600}
+.tag-red{background:rgba(255,71,87,.1);border:1px solid rgba(255,71,87,.25);color:var(--red)}
+.tag-green{background:rgba(0,255,157,.1);border:1px solid rgba(0,255,157,.25);color:var(--green)}
+.tag-yellow{background:rgba(255,211,42,.1);border:1px solid rgba(255,211,42,.25);color:var(--yellow)}
+.tag-blue{background:rgba(0,229,255,.08);border:1px solid rgba(0,229,255,.2);color:var(--accent)}
+.tag-gold{background:rgba(201,168,76,.1);border:1px solid rgba(201,168,76,.25);color:var(--gold)}
+
+/* ALERT */
+.alert{padding:11px 15px;border-radius:8px;font-size:.8rem;display:flex;gap:10px;align-items:flex-start;margin-bottom:10px;line-height:1.5}
+.alert-red{background:rgba(255,71,87,.06);border:1px solid rgba(255,71,87,.2);color:#ff8888}
+.alert-yellow{background:rgba(255,211,42,.06);border:1px solid rgba(255,211,42,.2);color:var(--yellow)}
+.alert-green{background:rgba(0,255,157,.06);border:1px solid rgba(0,255,157,.2);color:var(--green)}
+.alert-blue{background:rgba(0,229,255,.06);border:1px solid rgba(0,229,255,.18);color:var(--accent)}
+
+/* BIG NUMBER */
+.big-num{font-family:'Syne',sans-serif;font-weight:800}
+
+/* FORM */
+.f-label{display:block;font-size:.73rem;color:var(--text2);margin-bottom:5px;font-weight:600;letter-spacing:.02em}
+.f-input{width:100%;background:var(--bg3);border:1px solid var(--border);border-radius:8px;
+  padding:9px 12px;color:var(--text);font-family:'DM Sans',sans-serif;font-size:.85rem;
+  outline:none;transition:border-color .2s}
+.f-input:focus{border-color:var(--accent);box-shadow:0 0 0 2px rgba(0,229,255,.08)}
+select.f-input option{background:var(--bg3)}
+.f-group{margin-bottom:12px}
+
+/* CONTRATO */
+.ct-doc{background:#fff;padding:30px 34px;font-family:'Times New Roman',serif;color:#111;
+  font-size:10.5pt;line-height:1.75;min-height:100%}
+.ct-header{text-align:center;border-bottom:2px solid #C9A84C;padding-bottom:14px;margin-bottom:18px}
+.ct-logo-txt{font-family:'Arial Black',sans-serif;font-weight:900;font-size:19pt;color:#C9A84C;letter-spacing:-.02em}
+.ct-title{font-size:12pt;font-weight:700;color:#0d1117;margin-top:4px;letter-spacing:.03em}
+.ct-subtitle{font-size:8.5pt;color:#666;margin-top:2px}
+.ct-h2{font-size:10.5pt;font-weight:700;color:#0d1117;border-left:3px solid #C9A84C;
+  padding-left:8px;margin:14px 0 7px}
+.ct-p{font-size:9.5pt;color:#222;margin-bottom:5px;text-align:justify}
+.ct-parties-box{background:#f7f8fc;border:1px solid #dde2f0;border-radius:6px;
+  padding:13px 16px;margin:10px 0;font-size:9.5pt}
+.ct-sign{margin-top:26px;border-top:1px solid #dde;padding-top:18px;
+  display:grid;grid-template-columns:1fr 1fr;gap:36px}
+.ct-sign-blk{text-align:center}
+.ct-sign-line{border-bottom:1px solid #aaa;margin-bottom:5px;height:38px}
+.ct-sign-name{font-size:8.5pt;font-weight:700;color:#333}
+.ct-sign-role{font-size:7.5pt;color:#777}
+.ct-pix{background:#f0fff6;border:1px solid #99ddbb;border-radius:8px;
+  padding:16px;margin-top:14px;text-align:center}
+.ct-pix-title{font-family:'Arial',sans-serif;font-size:10pt;font-weight:700;color:#005522;margin-bottom:6px}
+.ct-pix-key{font-family:'Courier New',monospace;font-size:9pt;color:#1a3322;
+  background:#dff5ea;padding:3px 12px;border-radius:4px;display:inline-block;margin-bottom:10px}
+.ct-pix-note{font-size:7.5pt;color:#448866;margin-top:7px}
+.ct-footer{text-align:center;font-size:7pt;color:#bbb;margin-top:10px;
+  font-family:'Courier New',monospace}
+.sig-canvas-wrap{position:relative;border:1.5px dashed #aaa;border-radius:6px;background:#fafbff;cursor:crosshair;margin-bottom:6px}
+.sig-canvas-wrap canvas{display:block;width:100%;height:70px;touch-action:none}
+.sig-clear{position:absolute;top:4px;right:6px;background:none;border:none;font-size:.65rem;color:#aaa;cursor:pointer;font-family:'DM Sans',sans-serif;padding:2px 6px;border-radius:4px}
+.sig-clear:hover{background:#eee;color:#666}
+.sig-label{font-size:.62rem;color:#888;text-align:center;margin-top:2px;font-family:'DM Sans',sans-serif}
+.ct-action-bar{display:flex;gap:8px;margin-top:14px;flex-wrap:wrap}
+.ct-action-btn{flex:1;min-width:120px;padding:10px 8px;border-radius:8px;font-family:'Syne',sans-serif;font-weight:700;font-size:.78rem;cursor:pointer;border:none;display:flex;align-items:center;justify-content:center;gap:7px;transition:all .2s;white-space:nowrap}
+.ct-btn-print{background:linear-gradient(135deg,#1a2340,#2a3560);color:#E8C96A}
+.ct-btn-print:hover{opacity:.88}
+.ct-btn-wpp{background:linear-gradient(135deg,#25d366,#1ebe5d);color:#fff}
+.ct-btn-wpp:hover{opacity:.88}
+.ct-btn-email{background:linear-gradient(135deg,#0078d4,#005fa3);color:#fff}
+.ct-btn-email:hover{opacity:.88}
+
+/* SIMULADOR */
+.sim-box{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:22px;margin-bottom:16px}
+.sim-label{font-family:'DM Mono',monospace;font-size:.65rem;color:var(--text3);text-transform:uppercase;letter-spacing:.1em;margin-bottom:8px}
+.sim-val{font-family:'Syne',sans-serif;font-weight:800;font-size:1.9rem}
+.sim-val.red{color:var(--red)} .sim-val.green{color:var(--green)} .sim-val.gold{color:var(--gold)} .sim-val.yellow{color:var(--yellow)}
+.progress-bar{height:8px;background:var(--bg3);border-radius:4px;overflow:hidden;margin-top:8px}
+.progress-fill{height:100%;border-radius:4px;transition:width 1.2s ease}
+
+/* TABELA PREÇOS */
+.price-table{width:100%;border-collapse:collapse;font-size:.82rem}
+.price-table th{background:var(--bg3);padding:10px 14px;text-align:left;color:var(--text2);
+  font-weight:700;font-family:'DM Mono',monospace;font-size:.65rem;text-transform:uppercase;
+  letter-spacing:.06em;border-bottom:2px solid var(--border)}
+.price-table td{padding:10px 14px;border-bottom:1px solid var(--border);color:var(--text)}
+.price-table tr:hover td{background:rgba(255,255,255,.02)}
+.price-table tr.highlight-row td{background:linear-gradient(90deg,rgba(201,168,76,.07),transparent);
+  border-left:3px solid var(--gold)}
+.price-table .price-val{font-family:'Syne',sans-serif;font-weight:800;font-size:1rem;color:var(--gold)}
+.price-table .price-custom{font-family:'Syne',sans-serif;font-weight:700;font-size:.9rem;color:var(--accent2)}
+
+/* REPORT PREVIEW */
+.rpt{background:#fff;border-radius:10px;overflow:hidden;color:#111;font-size:.78rem}
+.rpt-top{background:#0d1117;padding:14px 20px;display:flex;justify-content:space-between;align-items:center}
+.rpt-logo{font-family:'Syne',sans-serif;font-weight:800;color:#C9A84C;font-size:1rem}
+.rpt-meta-txt{font-family:'DM Mono',monospace;font-size:.58rem;color:rgba(255,255,255,.35);text-align:right}
+.rpt-body{padding:18px 20px}
+.rpt-empresa-bar{background:linear-gradient(135deg,#0d1117,#161d35);border-radius:7px;
+  padding:12px 16px;margin-bottom:14px;display:flex;justify-content:space-between;align-items:center}
+.rpt-empresa-nome{font-family:'Syne',sans-serif;font-weight:800;font-size:.9rem;color:#E8C96A}
+.rpt-empresa-info{font-size:.6rem;color:rgba(255,255,255,.4);font-family:'DM Mono',monospace;margin-top:2px}
+.rpt-score{text-align:right}
+.rpt-score-val{font-family:'Syne',sans-serif;font-weight:800;font-size:1.3rem;color:#00ff9d}
+.rpt-score-lbl{font-size:.55rem;color:rgba(0,255,157,.5);font-family:'DM Mono',monospace}
+.rpt-kpi-row{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:12px}
+.rpt-kpi{border-radius:6px;padding:9px 11px;text-align:center}
+.rpt-kpi.r{background:#fff0f0;border:1px solid #ffcccc}.rpt-kpi.g{background:#f0fff6;border:1px solid #bde8cc}.rpt-kpi.b{background:#f0f7ff;border:1px solid #bcd5f5}
+.rpt-kpi-val{font-family:'Syne',sans-serif;font-weight:800;font-size:1.05rem;color:#1a2340;margin-bottom:2px}
+.rpt-kpi.r .rpt-kpi-val{color:#cc2200}.rpt-kpi.g .rpt-kpi-val{color:#008833}.rpt-kpi.b .rpt-kpi-val{color:#1155bb}
+.rpt-kpi-lbl{font-size:.58rem;color:#6677aa}
+.rpt-sec-title{font-family:'Syne',sans-serif;font-weight:700;font-size:.75rem;color:#1a2340;
+  border-bottom:2px solid #C9A84C;padding-bottom:4px;margin:10px 0 8px}
+.rpt-alert{padding:7px 10px;border-radius:5px;font-size:.7rem;margin-bottom:5px;display:flex;gap:7px;line-height:1.45}
+.rpt-alert.w{background:#fff8f0;border:1px solid #ffcc88;color:#884400}
+.rpt-alert.i{background:#f0f7ff;border:1px solid #aaccff;color:#224488}
+.rpt-alert.s{background:#f0fff4;border:1px solid #88ddaa;color:#005522}
+.rpt-bar-row{display:flex;align-items:center;gap:8px;margin-bottom:5px}
+.rpt-bar-lbl{width:70px;font-size:.65rem;color:#6677aa;text-align:right;flex-shrink:0}
+.rpt-bar-track{flex:1;height:18px;background:#eef0f8;border-radius:3px;overflow:hidden}
+.rpt-bar-fill{height:100%;display:flex;align-items:center;padding-left:6px;
+  font-size:.6rem;font-weight:700;white-space:nowrap;border-radius:3px}
+.rpt-bar-fill.a{background:linear-gradient(90deg,#ff9966,#ff6644);color:#fff}
+.rpt-bar-fill.n{background:linear-gradient(90deg,#44bb88,#22aa66);color:#fff}
+
+/* PREVIEW SPLIT */
+.preview-split{display:grid;grid-template-columns:1fr 360px;gap:16px;height:calc(100vh - 158px)}
+.form-col{overflow-y:auto;padding-right:4px}
+.form-col::-webkit-scrollbar{width:4px}
+.form-col::-webkit-scrollbar-thumb{background:var(--border);border-radius:2px}
+.doc-col{overflow-y:auto;border-radius:12px;border:1px solid var(--border)}
+.doc-col::-webkit-scrollbar{width:4px}
+.doc-col::-webkit-scrollbar-thumb{background:var(--border);border-radius:2px}
+#rpt-content::-webkit-scrollbar{width:5px}
+#rpt-content::-webkit-scrollbar-track{background:#f0f0f0}
+#rpt-content::-webkit-scrollbar-thumb{background:#C9A84C;border-radius:3px}
+.doc-empty{display:flex;flex-direction:column;align-items:center;justify-content:center;
+  height:100%;min-height:420px;color:var(--text3);text-align:center;gap:8px;padding:32px}
+
+/* MODAL */
+.modal-over{display:none;position:fixed;inset:0;background:rgba(0,0,0,.82);z-index:500;
+  align-items:center;justify-content:center;backdrop-filter:blur(8px)}
+.modal-over.open{display:flex}
+.modal-box{background:var(--bg2);border:1px solid var(--border);border-radius:16px;
+  width:100%;max-width:420px;padding:28px;position:relative}
+.modal-close{position:absolute;top:13px;right:13px;background:none;border:none;
+  color:var(--text3);cursor:pointer;font-size:1.1rem;padding:4px}
+.modal-close:hover{color:var(--text)}
+
+/* CAPA S0 */
+.capa{display:flex;flex-direction:column;align-items:center;justify-content:center;
+  text-align:center;height:100%;padding:40px 60px}
+.capa-logo{font-family:'Syne',sans-serif;font-weight:800;font-size:3.2rem;
+  background:linear-gradient(135deg,#C9A84C,#E8C96A);
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;
+  letter-spacing:-.03em}
+.capa-sub-brand{font-family:'DM Mono',monospace;font-size:.65rem;color:var(--text3);
+  letter-spacing:.2em;text-transform:uppercase;margin-top:-6px;margin-bottom:32px}
+.capa-h{font-family:'Syne',sans-serif;font-weight:800;font-size:2.1rem;color:var(--text);
+  line-height:1.15;margin-bottom:14px;max-width:700px}
+.capa-p{font-size:.95rem;color:var(--text2);max-width:560px;line-height:1.6;margin-bottom:30px}
+.capa-badges{display:flex;gap:10px;flex-wrap:wrap;justify-content:center;margin-bottom:32px}
+.capa-threat{background:var(--card);border:1px solid rgba(255,71,87,.25);border-radius:12px;
+  padding:18px 28px;max-width:680px;width:100%;display:grid;grid-template-columns:repeat(3,1fr);gap:20px;text-align:center}
+.capa-threat-num{font-family:'Syne',sans-serif;font-weight:800;font-size:1.8rem;color:var(--red);margin-bottom:4px}
+.capa-threat-lbl{font-size:.75rem;color:var(--text2);line-height:1.4}
+
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.5}}
+@keyframes fadeUp{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
+.fade-up{animation:fadeUp .5s ease forwards}
+
+@media print{
+  /* Reset completo — esconde tudo */
+  html, body{
+    margin:0 !important;
+    padding:0 !important;
+    background:#fff !important;
+    height:auto !important;
+    overflow:visible !important;
+  }
+  body > *{ display:none !important }
+
+  /* Mostra só a área de impressão, em fluxo normal de documento */
+  #print-contract-area{
+    display:block !important;
+    position:relative !important;
+    width:100% !important;
+    height:auto !important;
+    overflow:visible !important;
+    background:#fff !important;
+    padding:0 !important;
+    margin:0 !important;
+  }
+
+  /* O documento em si */
+  #print-contract-area .ct-doc{
+    font-size:10pt !important;
+    line-height:1.65 !important;
+    padding:14mm 16mm !important;
+    color:#111 !important;
+    background:#fff !important;
+    width:auto !important;
+    max-width:100% !important;
+    box-shadow:none !important;
+    border-radius:0 !important;
+    height:auto !important;
+    overflow:visible !important;
+  }
+
+  /* Ocultar botões dentro do clone */
+  #print-contract-area .ct-action-bar{ display:none !important }
+  #print-contract-area .sig-clear{ display:none !important }
+
+  /* Assinatura */
+  #print-contract-area .ct-sign{
+    break-inside:avoid;
+    page-break-inside:avoid;
+  }
+  #print-contract-area .sig-canvas-wrap{
+    break-inside:avoid;
+    border:1px dashed #bbb !important;
+    background:#fafbff !important;
+  }
+  #print-contract-area .sig-canvas-wrap canvas{
+    display:block !important;
+    width:100% !important;
+    height:60px !important;
+    max-height:60px !important;
+  }
+  #print-contract-area .sig-label{ display:block !important }
+
+  /* PIX não quebra */
+  #print-contract-area .ct-pix{
+    break-inside:avoid;
+    page-break-inside:avoid;
+  }
+
+  /* Títulos de cláusula ficam junto ao parágrafo */
+  #print-contract-area .ct-h2{
+    break-after:avoid;
+    page-break-after:avoid;
+  }
+
+  /* Parágrafos com controle de órfãos */
+  #print-contract-area .ct-p{
+    orphans:3;
+    widows:3;
+  }
+}
+
+/* TIMER COUNTDOWN */
+.timer-countdown{font-family:'DM Mono',monospace;font-size:.68rem;color:var(--text3);
+  transition:color .3s;min-width:32px;text-align:center}
+.timer-countdown.urgent{color:var(--warn);animation:pulse 1s infinite}
+
+/* FULLSCREEN BTN */
+.btn-fs{background:transparent;border:1px solid var(--border);color:var(--text3);
+  padding:7px 10px;border-radius:6px;cursor:pointer;font-size:.75rem;transition:all .2s}
+.btn-fs:hover{border-color:var(--accent);color:var(--accent)}
+
+/* DRAFT BANNER */
+#draft-banner{display:none;position:fixed;top:8px;left:50%;transform:translateX(-50%);
+  z-index:500;background:linear-gradient(135deg,rgba(201,168,76,.15),rgba(0,229,255,.08));
+  border:1px solid rgba(201,168,76,.4);border-radius:10px;padding:10px 18px;
+  backdrop-filter:blur(10px);display:flex;align-items:center;gap:12px;
+  font-size:.78rem;color:var(--text);box-shadow:0 4px 24px rgba(0,0,0,.4)}
+#draft-banner.show{display:flex}
+.draft-btn{padding:5px 12px;border-radius:6px;font-family:'Syne',sans-serif;
+  font-weight:700;font-size:.72rem;cursor:pointer;border:none;transition:all .2s}
+.draft-restore{background:var(--gold);color:#000}
+.draft-discard{background:transparent;border:1px solid var(--border);color:var(--text2)}
+
+/* NOME EMPRESA NA CAPA */
+#capa-empresa-input{background:rgba(255,255,255,.06);border:1px solid rgba(201,168,76,.3);
+  border-radius:8px;padding:10px 16px;color:var(--text);font-family:'DM Sans',sans-serif;
+  font-size:.95rem;width:340px;text-align:center;outline:none;transition:all .2s}
+#capa-empresa-input:focus{border-color:var(--gold);background:rgba(255,255,255,.09)}
+#capa-empresa-input::placeholder{color:var(--text3)}
+#capa-empresa-nome{font-family:'Syne',sans-serif;font-weight:800;font-size:1.1rem;
+  color:var(--gold);min-height:28px;transition:all .3s}
+
+/* AUTOSAVE INDICATOR */
+#autosave-dot{width:7px;height:7px;border-radius:50%;background:var(--text3);
+  transition:all .4s;flex-shrink:0}
+#autosave-dot.saving{background:var(--yellow);animation:pulse 0.6s infinite}
+#autosave-dot.saved{background:var(--green)}
+
+/* MOBILE ADJUSTMENTS */
+@media(max-width:768px){
+  .slide-inner{padding:20px 18px 80px}
+  .preview-split{grid-template-columns:1fr!important}
+  .doc-col{height:400px}
+  .navbar{padding:10px 14px}
+  .nb-brand{display:none}
+  .g2,.g3,.g4{grid-template-columns:1fr!important}
+  .capa{padding:24px 18px}
+  .capa-h{font-size:1.4rem}
+  #capa-empresa-input{width:100%}
+  .ct-action-bar{flex-direction:column}
+}
+</style>
+</head>
+<body>
+
+<div class="timer-bar"><div class="timer-fill" id="tfill"></div></div>
+<div class="wrap" id="wrap">
+
+<!-- ══════════════════════════════════════════
+     SLIDE 0 — CAPA
+══════════════════════════════════════════ -->
+<div class="slide active" id="s0">
+<div class="capa">
+  <svg viewBox="0 0 60 60" width="68" height="68" style="margin-bottom:10px" aria-hidden="true">
+    <defs><linearGradient id="gg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#C9A84C"/><stop offset="100%" style="stop-color:#E8C96A"/>
+    </linearGradient></defs>
+    <g stroke="url(#gg)" stroke-width="1.5" fill="none" stroke-linecap="round">
+      <line x1="30" y1="8" x2="17" y2="23"/><line x1="30" y1="8" x2="43" y2="23"/>
+      <line x1="17" y1="23" x2="10" y2="42"/><line x1="17" y1="23" x2="30" y2="33"/><line x1="17" y1="23" x2="46" y2="29"/>
+      <line x1="43" y1="23" x2="46" y2="29"/><line x1="43" y1="23" x2="30" y2="33"/><line x1="43" y1="23" x2="10" y2="42"/>
+      <line x1="30" y1="33" x2="30" y2="49"/><line x1="10" y1="42" x2="30" y2="49"/><line x1="46" y1="29" x2="30" y2="49"/>
+    </g>
+    <g fill="url(#gg)">
+      <circle cx="30" cy="8" r="3.5"/><circle cx="17" cy="23" r="3"/><circle cx="43" cy="23" r="3"/>
+      <circle cx="10" cy="42" r="2.5"/><circle cx="46" cy="29" r="2.5"/><circle cx="30" cy="33" r="3"/>
+      <circle cx="30" cy="49" r="3.5"/>
+    </g>
+  </svg>
+
+  <div class="capa-logo">PBSmart</div>
+  <div class="capa-sub-brand">Diagnóstico Tributário · Reforma Tributária LC 214/2025</div>
+
+  <div style="margin-bottom:16px">
+    <div style="font-size:.68rem;color:var(--text3);font-family:'DM Mono',monospace;text-transform:uppercase;letter-spacing:.1em;margin-bottom:8px">Preparado para</div>
+    <div id="capa-empresa-nome">—</div>
+    <input type="text" id="capa-empresa-input" placeholder="Digite o nome da empresa visitada..." oninput="atualizarEmpresa(this.value)" style="margin-top:10px">
+  </div>
+  <div class="capa-h">Sua empresa está preparada<br>para a maior mudança tributária dos últimos 50 anos?</div>
+  <div class="capa-p">A Reforma Tributária já é lei. Em 2026 começa a vigência do CBS e IBS — e cada empresa terá um impacto diferente. Vamos mostrar o impacto <strong style="color:var(--text)">específico para o seu negócio</strong>.</div>
+
+  <div class="capa-badges">
+    <span class="tag tag-red" style="font-size:.72rem;padding:4px 12px">⚠ Vigência: Jan/2026</span>
+    <span class="tag tag-yellow" style="font-size:.72rem;padding:4px 12px">⚡ CBS + IBS + IS</span>
+    <span class="tag tag-blue" style="font-size:.72rem;padding:4px 12px">LC 214/2025</span>
+    <span class="tag tag-gold" style="font-size:.72rem;padding:4px 12px">Transição 2026–2033</span>
+  </div>
+
+  <div class="capa-threat">
+    <div>
+      <div class="capa-threat-num">26,5%</div>
+      <div class="capa-threat-lbl">Alíquota CBS+IBS no Regime Normal — contra ~9,25% de PIS/COFINS hoje</div>
+    </div>
+    <div>
+      <div class="capa-threat-num">2026</div>
+      <div class="capa-threat-lbl">Ano em que as primeiras obrigações do novo sistema entram em vigor</div>
+    </div>
+    <div>
+      <div class="capa-threat-num">7 anos</div>
+      <div class="capa-threat-lbl">Janela de transição para se adaptar — ou deixar dinheiro na mesa</div>
+    </div>
+  </div>
+</div>
+</div>
+
+<!-- ══════════════════════════════════════════
+     SLIDE 1 — O QUE MUDA (O PROBLEMA)
+══════════════════════════════════════════ -->
+<div class="slide" id="s1">
+<div class="slide-inner">
+  <div class="lbl lbl-red">⚠ O que muda para sua empresa</div>
+  <div class="h1">A Reforma Tributária impacta diretamente<br>o caixa e os preços da sua empresa</div>
+  <div class="sub">Não é apenas uma mudança de nome — é uma nova lógica tributária que afeta contratos, preços, fornecedores e fluxo de caixa.</div>
+
+  <div class="g3" style="margin-bottom:16px">
+    <div class="card card-red">
+      <div style="font-size:1.1rem;margin-bottom:8px">💸</div>
+      <div style="font-family:'Syne',sans-serif;font-weight:700;font-size:.9rem;color:var(--text);margin-bottom:6px">Carga tributária recalibrada</div>
+      <div style="font-size:.78rem;color:var(--text2);line-height:1.5">PIS/COFINS (9,25%) + ICMS + ISS são extintos e substituídos por CBS+IBS de <strong style="color:var(--red)">26,5%</strong>. Dependendo do setor, a carga pode subir ou cair — mas sem planejamento, quase sempre sobe.</div>
+    </div>
+    <div class="card card-red">
+      <div style="font-size:1.1rem;margin-bottom:8px">💳</div>
+      <div style="font-family:'Syne',sans-serif;font-weight:700;font-size:.9rem;color:var(--text);margin-bottom:6px">Split Payment — impacto no caixa</div>
+      <div style="font-size:.78rem;color:var(--text2);line-height:1.5">O imposto será retido automaticamente no momento do pagamento. Empresas perdem capital de giro disponível para outros fins — sem planejamento, o efeito no fluxo de caixa pode ser severo.</div>
+    </div>
+    <div class="card card-red">
+      <div style="font-size:1.1rem;margin-bottom:8px">🏭</div>
+      <div style="font-family:'Syne',sans-serif;font-weight:700;font-size:.9rem;color:var(--text);margin-bottom:6px">Perda de crédito com fornecedores</div>
+      <div style="font-size:.78rem;color:var(--text2);line-height:1.5">Fornecedores no Simples Nacional não geram crédito de CBS/IBS. Quem não revisar sua cadeia de fornecedores vai pagar mais imposto sem perceber.</div>
+    </div>
+  </div>
+
+  <div class="g2" style="margin-bottom:16px">
+    <div class="card">
+      <div style="font-family:'Syne',sans-serif;font-weight:700;font-size:.88rem;color:var(--text);margin-bottom:12px">📅 Cronograma da Reforma</div>
+      <div style="display:flex;flex-direction:column;gap:8px">
+        <div style="display:flex;gap:12px;align-items:flex-start">
+          <span class="tag tag-red" style="flex-shrink:0;margin-top:2px">2023</span>
+          <div style="font-size:.78rem;color:var(--text2)">EC 132/2023 — Emenda Constitucional aprovada. Reforma é lei constitucional.</div>
+        </div>
+        <div style="display:flex;gap:12px;align-items:flex-start">
+          <span class="tag tag-yellow" style="flex-shrink:0;margin-top:2px">2025</span>
+          <div style="font-size:.78rem;color:var(--text2)">LC 214/2025 — Regulamentação do CBS e IBS publicada. Regras definidas.</div>
+        </div>
+        <div style="display:flex;gap:12px;align-items:flex-start;background:rgba(255,211,42,.05);border:1px solid rgba(255,211,42,.2);border-radius:8px;padding:8px;margin-top:2px">
+          <span class="tag tag-yellow" style="flex-shrink:0;margin-top:2px;animation:pulse 1.5s infinite">◉ AGORA</span>
+          <div style="font-size:.78rem;color:var(--yellow);font-weight:600">2026 — Vigência CBS 1% + IBS. Split Payment começa. Sua empresa precisa estar preparada.</div>
+        </div>
+        <div style="display:flex;gap:12px;align-items:flex-start">
+          <span class="tag tag-blue" style="flex-shrink:0;margin-top:2px">2027</span>
+          <div style="font-size:.78rem;color:var(--text2)">Transição 25% — CBS e IBS em velocidade de cruzeiro. Perda de crédito com Simples ativa.</div>
+        </div>
+        <div style="display:flex;gap:12px;align-items:flex-start">
+          <span class="tag tag-green" style="flex-shrink:0;margin-top:2px">2033</span>
+          <div style="font-size:.78rem;color:var(--text2)">Regime pleno — extinção total de ICMS, ISS, PIS e COFINS. Novo sistema consolidado.</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card card-gold">
+      <div style="font-family:'Syne',sans-serif;font-weight:700;font-size:.88rem;color:var(--gold);margin-bottom:12px">💡 O que a maioria das empresas não sabe</div>
+      <div style="display:flex;flex-direction:column;gap:9px">
+        <div class="alert alert-yellow">⚡ <div>A nova lei prevê <strong>reduções de 30% a 100%</strong> para determinados setores e atividades — quem não conhece a norma paga mais do que deveria.</div></div>
+        <div class="alert alert-red">🔥 <div>Contratos de longo prazo fechados sem <strong>cláusula de reajuste tributário</strong> absorverão o aumento sem possibilidade de repasse.</div></div>
+        <div class="alert alert-blue">📋 <div>A classificação NCM/NBS do seu produto ou serviço define a alíquota exata — <strong>errar a classificação gera risco fiscal e pagamento a maior.</strong></div></div>
+        <div class="alert alert-green">✅ <div>Com diagnóstico e planejamento <strong>você pode se preparar antes de 2027</strong> e transformar a reforma em vantagem competitiva.</div></div>
+      </div>
+    </div>
+  </div>
+</div>
+</div>
+
+<!-- ══════════════════════════════════════════
+     SLIDE 2 — SIMULADOR INTERATIVO
+══════════════════════════════════════════ -->
+<div class="slide" id="s2">
+<div class="slide-inner">
+  <div class="lbl lbl-blue">🔢 Simulação em Tempo Real</div>
+  <div class="h1">Quanto a Reforma impacta<br>uma empresa como a sua?</div>
+  <div class="sub">Insira os dados da empresa para ver uma estimativa do impacto — é exatamente isso que nosso diagnóstico completo calcula com precisão.</div>
+
+  <div class="g2">
+    <!-- INPUTS -->
+    <div>
+      <div class="card" style="margin-bottom:14px">
+        <div style="font-family:'Syne',sans-serif;font-weight:700;font-size:.9rem;color:var(--text);margin-bottom:14px">📊 Dados da empresa</div>
+        <div class="f-group">
+          <label class="f-label">Faturamento mensal aproximado (R$)</label>
+          <select class="f-input" id="sim_fat" onchange="simCalc()">
+            <option value="">— Selecione —</option>
+            <option value="50000">Até R$ 50.000</option>
+            <option value="80000">R$ 50.001 – R$ 100.000</option>
+            <option value="200000">R$ 100.001 – R$ 300.000</option>
+            <option value="450000">R$ 300.001 – R$ 600.000</option>
+            <option value="700000">R$ 600.001 – R$ 800.000</option>
+            <option value="1100000">R$ 800.001 – R$ 1.500.000</option>
+            <option value="2000000">Acima de R$ 1.500.000</option>
+          </select>
+        </div>
+        <div class="f-group">
+          <label class="f-label">Regime tributário atual</label>
+          <select class="f-input" id="sim_regime" onchange="simCalc()">
+            <option value="">— Selecione —</option>
+            <option value="simples">Simples Nacional</option>
+            <option value="presumido">Lucro Presumido</option>
+            <option value="real">Lucro Real</option>
+          </select>
+        </div>
+        <div class="f-group">
+          <label class="f-label">Setor de atividade</label>
+          <select class="f-input" id="sim_setor" onchange="simCalc()">
+            <option value="">— Selecione —</option>
+            <option value="comercio">Comércio (varejo/atacado)</option>
+            <option value="industria">Indústria / Fabricação</option>
+            <option value="servicos">Serviços gerais</option>
+            <option value="saude">Saúde (clínica/lab)</option>
+            <option value="educacao">Educação</option>
+            <option value="construcao">Construção Civil</option>
+            <option value="ti">Tecnologia / SaaS</option>
+            <option value="agro">Agronegócio</option>
+          </select>
+        </div>
+        <div class="f-group">
+          <label class="f-label">% de compras de fornecedores no Simples Nacional</label>
+          <input type="range" id="sim_simples_pct" min="0" max="100" value="30" oninput="simCalc();document.getElementById('sim_simples_val').textContent=this.value+'%'" class="f-input" style="padding:6px 0;cursor:pointer">
+          <div style="display:flex;justify-content:space-between;font-size:.68rem;color:var(--text3);margin-top:2px">
+            <span>0%</span><span id="sim_simples_val" style="color:var(--accent);font-weight:700">30%</span><span>100%</span>
+          </div>
+        </div>
+      </div>
+      <div id="sim_alerta" style="display:none"></div>
+    </div>
+
+    <!-- RESULTADOS -->
+    <div id="sim_results" style="display:none">
+      <div class="g2" style="margin-bottom:12px">
+        <div class="sim-box">
+          <div class="sim-label">Exposição CBS+IBS estimada/mês</div>
+          <div class="sim-val red" id="r_exposicao">—</div>
+        </div>
+        <div class="sim-box">
+          <div class="sim-label">Créditos recuperáveis estimados/mês</div>
+          <div class="sim-val green" id="r_creditos">—</div>
+        </div>
+      </div>
+      <div class="g2" style="margin-bottom:12px">
+        <div class="sim-box">
+          <div class="sim-label">Impacto líquido estimado/mês</div>
+          <div class="sim-val gold" id="r_liquido">—</div>
+        </div>
+        <div class="sim-box">
+          <div class="sim-label">Capital de giro impactado (split payment)</div>
+          <div class="sim-val yellow" id="r_split">—</div>
+        </div>
+      </div>
+      <div class="card" style="margin-bottom:12px">
+        <div class="sim-label" style="margin-bottom:8px">Comparativo de carga: regime atual vs. 2033</div>
+        <div class="rpt-bar-row" style="margin-bottom:8px">
+          <div class="rpt-bar-lbl">Hoje</div>
+          <div class="rpt-bar-track"><div class="rpt-bar-fill a" id="r_bar_atual" style="width:40%">—</div></div>
+        </div>
+        <div class="rpt-bar-row">
+          <div class="rpt-bar-lbl">2033</div>
+          <div class="rpt-bar-track"><div class="rpt-bar-fill n" id="r_bar_2033" style="width:60%">—</div></div>
+        </div>
+      </div>
+      <div class="card card-gold" style="text-align:center">
+        <div style="font-size:.75rem;color:var(--text3);margin-bottom:4px">Perda anual estimada sem diagnóstico</div>
+        <div class="big-num" style="font-size:1.8rem;color:var(--red)" id="r_perda_anual">—</div>
+        <div style="font-size:.72rem;color:var(--text2);margin-top:6px">⚠ Esta é uma estimativa simplificada.<br>O diagnóstico completo considera 15+ variáveis específicas da sua empresa.</div>
+      </div>
+    </div>
+
+    <div id="sim_placeholder" style="display:flex;flex-direction:column;align-items:center;justify-content:center;height:100%;color:var(--text3);text-align:center;gap:10px;padding:40px">
+      <div style="font-size:3rem">🔢</div>
+      <div style="font-family:'Syne',sans-serif;font-weight:700;font-size:.95rem;color:var(--text2)">Preencha os dados ao lado</div>
+      <div style="font-size:.8rem">Os resultados aparecerão aqui em tempo real</div>
+    </div>
+  </div>
+</div>
+</div>
+
+
+
+<!-- ══════════════════════════════════════════
+     SLIDE 5 — RELATÓRIO MODELO COMPLETO
+══════════════════════════════════════════ -->
+<div class="slide" id="s5">
+<div class="slide-inner" style="padding-bottom:80px">
+  <div class="lbl lbl-gold">📑 Modelo de Relatório</div>
+  <div class="h1" style="margin-bottom:4px">Isso é o que a sua empresa recebe</div>
+  <div class="sub" style="margin-bottom:16px">Relatório real gerado para um cliente do setor de <strong style="color:var(--gold)">Saúde</strong> — 21 seções, dados reais, linguagem executiva. O seu terá os dados da sua empresa.</div>
+
+  <!-- DEMO BADGE -->
+  <div style="display:inline-flex;align-items:center;gap:8px;background:rgba(255,107,53,.1);border:1px solid rgba(255,107,53,.3);border-radius:8px;padding:7px 16px;margin-bottom:16px;font-size:.76rem;color:var(--warn)">
+    📌 <strong>MODELO DE DEMONSTRAÇÃO</strong> — dados reais · cliente do setor de Saúde · autorizado para fins de apresentação
+  </div>
+
+  <div style="display:grid;grid-template-columns:260px 1fr;gap:16px;height:calc(100vh - 260px)">
+
+    <!-- ÍNDICE LATERAL -->
+    <div style="background:var(--card);border:1px solid var(--border);border-radius:12px;overflow-y:auto;padding:12px">
+      <div style="font-family:'DM Mono',monospace;font-size:.62rem;color:var(--text3);text-transform:uppercase;letter-spacing:.1em;margin-bottom:12px;padding-bottom:8px;border-bottom:1px solid var(--border)">17 seções do relatório</div>
+      <div id="rpt-menu" style="display:flex;flex-direction:column;gap:2px"></div>
+      <div style="margin-top:14px;padding-top:10px;border-top:1px solid var(--border)">
+        <div style="font-size:.68rem;color:var(--text3);margin-bottom:8px;font-family:'DM Mono',monospace">O QUE ESTÁ INCLUÍDO</div>
+        <div style="display:flex;flex-direction:column;gap:5px">
+          <div style="font-size:.72rem;color:var(--green);display:flex;gap:6px"><span>✓</span><span>Carga tributária 2026–2033</span></div>
+          <div style="font-size:.72rem;color:var(--green);display:flex;gap:6px"><span>✓</span><span>Decisor de regime ótimo</span></div>
+          <div style="font-size:.72rem;color:var(--green);display:flex;gap:6px"><span>✓</span><span>Simulação CBS/IBS + créditos</span></div>
+          <div style="font-size:.72rem;color:var(--green);display:flex;gap:6px"><span>✓</span><span>Alerta fornecedores</span></div>
+          <div style="font-size:.72rem;color:var(--green);display:flex;gap:6px"><span>✓</span><span>Formação de preços RT</span></div>
+          <div style="font-size:.72rem;color:var(--green);display:flex;gap:6px"><span>✓</span><span>ClassTrib NCM/NBS</span></div>
+          <div style="font-size:.72rem;color:var(--green);display:flex;gap:6px"><span>✓</span><span>Split Payment no fluxo de caixa</span></div>
+          <div style="font-size:.72rem;color:var(--green);display:flex;gap:6px"><span>✓</span><span>Créditos acumulados CBS/IBS</span></div>
+          <div style="font-size:.72rem;color:var(--green);display:flex;gap:6px"><span>✓</span><span>Cronograma de transição</span></div>
+          <div style="font-size:.72rem;color:var(--green);display:flex;gap:6px"><span>✓</span><span>Plano de ação priorizado</span></div>
+          <div style="font-size:.72rem;color:var(--green);display:flex;gap:6px"><span>✓</span><span>Pontos de atenção específicos</span></div>
+          <div style="font-size:.72rem;color:var(--green);display:flex;gap:6px"><span>✓</span><span>Calendário personalizado</span></div>
+          <div style="font-size:.72rem;color:var(--green);display:flex;gap:6px"><span>✓</span><span>TaxPlanningAI — 6 recomendações</span></div>
+          <div style="font-size:.72rem;color:var(--gold);display:flex;gap:6px"><span>+</span><span>Reunião de apresentação inclusa</span></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- CONTEÚDO -->
+    <div id="rpt-content" style="background:#fff;border:1px solid var(--border);border-radius:12px;overflow-y:auto;color:#1a2340"></div>
+  </div>
+</div>
+</div>
+
+
+<!-- ══════════════════════════════════════════
+     SLIDE 4 — INVESTIMENTO (TABELA)
+══════════════════════════════════════════ -->
+<div class="slide" id="s4">
+<div class="slide-inner">
+  <div class="lbl lbl-gold">💰 Investimento</div>
+  <div class="h1">Você acaba de ver o que entregamos.<br><span style="color:var(--green)">Veja o que custa.</span></div>
+  <div class="sub">Tudo que você viu no relatório — as 21 seções, o plano de ação, a reunião de apresentação — está incluído. O valor é definido pelo faturamento da sua empresa.</div>
+
+  <div class="g2">
+    <div>
+      <div class="card" style="margin-bottom:14px;overflow:hidden;padding:0">
+        <table class="price-table" id="price-table">
+          <thead><tr>
+            <th>Faturamento Mensal</th>
+            <th>Investimento</th>
+          </tr></thead>
+          <tbody>
+            <tr id="pr0"><td>Até R$ 100.000</td><td><span class="price-val">R$ 4.800</span></td></tr>
+            <tr id="pr1"><td>R$ 100.001 a R$ 300.000</td><td><span class="price-val">R$ 6.800</span></td></tr>
+            <tr id="pr2"><td>R$ 300.001 a R$ 600.000</td><td><span class="price-val">R$ 8.800</span></td></tr>
+            <tr id="pr3"><td>R$ 600.001 a R$ 800.000</td><td><span class="price-val">R$ 10.800</span></td></tr>
+            <tr id="pr4"><td>R$ 800.001 a R$ 1.500.000</td><td><span class="price-val">R$ 12.800</span></td></tr>
+            <tr id="pr5"><td>Acima de R$ 1.500.000</td><td><span class="price-custom">À combinar</span></td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="f-group">
+        <label class="f-label" style="margin-bottom:8px">Selecione o faturamento da sua empresa para ver o ROI:</label>
+        <select class="f-input" id="roi_fat" onchange="calcROI()">
+          <option value="">— Selecione —</option>
+          <option value="0">Até R$ 100.000 (investimento: R$ 4.800)</option>
+          <option value="1">R$ 100.001 – R$ 300.000 (investimento: R$ 6.800)</option>
+          <option value="2">R$ 300.001 – R$ 600.000 (investimento: R$ 8.800)</option>
+          <option value="3">R$ 600.001 – R$ 800.000 (investimento: R$ 10.800)</option>
+          <option value="4">R$ 800.001 – R$ 1.500.000 (investimento: R$ 12.800)</option>
+        </select>
+      </div>
+    </div>
+
+    <div>
+      <div id="roi_result" style="display:none">
+        <div class="card card-green" style="margin-bottom:12px;text-align:center;padding:20px">
+          <div style="font-size:.72rem;color:var(--text3);margin-bottom:4px">Economia potencial identificada / mês</div>
+          <div class="big-num" style="font-size:2.2rem;color:var(--green)" id="roi_economia">—</div>
+          <div style="font-size:.72rem;color:var(--text3);margin-top:6px">Média de descobertas em diagnósticos similares</div>
+        </div>
+        <div class="card" style="margin-bottom:12px">
+          <div style="font-size:.75rem;color:var(--text2);margin-bottom:8px;font-weight:600">Comparativo: investimento vs. exposição anual</div>
+          <div class="rpt-bar-row" style="margin-bottom:8px">
+            <div class="rpt-bar-lbl" style="color:var(--red)">Risco anual</div>
+            <div class="rpt-bar-track"><div class="rpt-bar-fill a" style="width:100%" id="roi_bar_risco">—</div></div>
+          </div>
+          <div class="rpt-bar-row">
+            <div class="rpt-bar-lbl" style="color:var(--green)">Investimento</div>
+            <div class="rpt-bar-track"><div class="rpt-bar-fill n" id="roi_bar_inv" style="width:5%">—</div></div>
+          </div>
+        </div>
+        <div class="card card-gold" style="text-align:center">
+          <div style="font-size:.72rem;color:var(--text3);margin-bottom:4px">ROI estimado em 12 meses</div>
+          <div class="big-num" style="font-size:2rem;color:var(--gold)" id="roi_val">—</div>
+          <div style="font-size:.72rem;color:var(--text2);margin-top:6px" id="roi_desc">Para cada R$1 investido, economia estimada</div>
+        </div>
+      </div>
+
+      <div id="roi_placeholder" style="display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:300px;color:var(--text3);text-align:center;gap:10px">
+        <div style="font-size:2.5rem">📈</div>
+        <div style="font-family:'Syne',sans-serif;font-weight:700;font-size:.9rem;color:var(--text2)">Selecione o faturamento</div>
+        <div style="font-size:.78rem">para ver o cálculo de ROI</div>
+      </div>
+
+      <div class="alert alert-green" style="margin-top:14px">
+        ✅ <div>O diagnóstico se paga com a <strong>primeira oportunidade identificada</strong> — e costumamos encontrar várias já na primeira análise.</div>
+      </div>
+    </div>
+  </div>
+</div>
+</div>
+
+<!-- ══════════════════════════════════════════
+     SLIDE 5 — CONTRATO (FECHAMENTO)
+══════════════════════════════════════════ -->
+<div class="slide" id="s6">
+<div class="slide-inner" style="padding-bottom:80px">
+  <div class="lbl lbl-gold">📄 Proposta e Fechamento</div>
+  <div class="h1" style="margin-bottom:4px">Vamos fechar agora?</div>
+  <div class="sub" style="margin-bottom:14px">Selecione o faturamento e o parcelamento — o QR Code PIX aparece imediatamente. O contrato é opcional, para assinar na reunião.</div>
+
+  <!-- ═══ PAINEL RÁPIDO: FAIXA + PARCELA + PIX — SEM PRECISAR PREENCHER NADA ═══ -->
+  <div style="background:linear-gradient(135deg,rgba(201,168,76,.08),rgba(0,255,157,.05));border:1px solid rgba(201,168,76,.3);border-radius:14px;padding:20px 24px;margin-bottom:18px">
+    <div style="font-family:'Syne',sans-serif;font-weight:800;font-size:.92rem;color:var(--gold);margin-bottom:14px;display:flex;align-items:center;gap:8px">
+      <span>💰</span> Valor do Investimento — selecione para gerar o PIX
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr auto;gap:12px;align-items:end">
+      <div>
+        <label class="f-label">Faturamento mensal da empresa</label>
+        <select class="f-input" id="ct_faixa" onchange="ctSetValor()" style="border-color:rgba(201,168,76,.35)">
+          <option value="">— Selecione a faixa —</option>
+          <option value="4800">Até R$ 100.000 → R$ 4.800</option>
+          <option value="6800">R$ 100.001 – R$ 300.000 → R$ 6.800</option>
+          <option value="8800">R$ 300.001 – R$ 600.000 → R$ 8.800</option>
+          <option value="10800">R$ 600.001 – R$ 800.000 → R$ 10.800</option>
+          <option value="12800">R$ 800.001 – R$ 1.500.000 → R$ 12.800</option>
+          <option value="0">Acima de R$ 1.500.000 → À combinar</option>
+        </select>
+      </div>
+      <div>
+        <label class="f-label">Parcelamento</label>
+        <select class="f-input" id="ct_parcelas" onchange="ctCalcParcela()" style="border-color:rgba(0,229,255,.3)">
+          <option value="1">À vista</option>
+          <option value="2">2x (mensal)</option>
+          <option value="4">4x (mensal)</option>
+          <option value="6">6x (mensal)</option>
+          <option value="10">10x (mensal)</option>
+        </select>
+      </div>
+      <button onclick="showPixModal()" id="btn-pix-rapido"
+        style="padding:10px 20px;border-radius:8px;background:linear-gradient(135deg,#00ff9d,#00cc7a);
+        color:#000;font-family:'Syne',sans-serif;font-weight:800;font-size:.85rem;cursor:pointer;
+        border:none;white-space:nowrap;display:flex;align-items:center;gap:7px;opacity:.4;pointer-events:none;transition:all .3s">
+        📱 Ver QR Code PIX
+      </button>
+    </div>
+
+    <!-- PAINEL DE RESULTADO — aparece ao selecionar faixa -->
+    <div id="ct_parcela_box" style="display:none;margin-top:14px;border-top:1px solid rgba(201,168,76,.2);padding-top:14px">
+      <div style="display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:12px;align-items:center">
+        <div style="text-align:center">
+          <div style="font-size:.62rem;color:var(--text3);font-family:'DM Mono',monospace;text-transform:uppercase;letter-spacing:.08em;margin-bottom:5px">Total</div>
+          <div style="font-family:'Syne',sans-serif;font-weight:800;font-size:1.15rem;color:var(--text)" id="cp_total">—</div>
+        </div>
+        <div style="text-align:center;border-left:1px solid var(--border)">
+          <div style="font-size:.62rem;color:var(--text3);font-family:'DM Mono',monospace;text-transform:uppercase;letter-spacing:.08em;margin-bottom:5px">Parcelas</div>
+          <div style="font-family:'Syne',sans-serif;font-weight:800;font-size:1.05rem;color:var(--accent)" id="cp_parcelas">—</div>
+        </div>
+        <div style="text-align:center;border-left:1px solid var(--border)">
+          <div style="font-size:.62rem;color:var(--text3);font-family:'DM Mono',monospace;text-transform:uppercase;letter-spacing:.08em;margin-bottom:5px">📱 PIX — Entrada</div>
+          <div style="font-family:'Syne',sans-serif;font-weight:800;font-size:1.5rem;color:var(--green)" id="cp_pix">—</div>
+        </div>
+        <div style="text-align:center">
+          <button onclick="showPixModal()"
+            style="width:100%;padding:11px 0;border-radius:8px;background:linear-gradient(135deg,#00ff9d,#00cc7a);
+            color:#000;font-family:'Syne',sans-serif;font-weight:800;font-size:.82rem;cursor:pointer;
+            border:none;display:flex;align-items:center;justify-content:center;gap:6px">
+            📱 Abrir PIX
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══ SPLIT: FORMULÁRIO + PREVIEW ═══ -->
+  <div class="preview-split">
+    <!-- FORMULÁRIO -->
+    <div class="form-col">
+      <div style="font-size:.72rem;color:var(--text3);font-family:'DM Mono',monospace;text-transform:uppercase;letter-spacing:.08em;margin-bottom:10px">
+        📝 Opcional — Preencha para gerar o contrato completo
+      </div>
+
+      <div class="card" style="margin-bottom:10px">
+        <div style="font-family:'Syne',sans-serif;font-weight:700;font-size:.85rem;color:var(--text);margin-bottom:10px">🏢 Dados do Contratante</div>
+        <div class="f-group"><label class="f-label">Razão Social / Nome *</label><input class="f-input" type="text" id="ct_nome" placeholder="Empresa Exemplo Ltda."></div>
+        <div class="g2">
+          <div class="f-group"><label class="f-label">CNPJ / CPF</label><input class="f-input" type="text" id="ct_cnpj" placeholder="00.000.000/0001-00" oninput="maskDoc(this)"></div>
+          <div class="f-group"><label class="f-label">Regime</label>
+            <select class="f-input" id="ct_regime">
+              <option value="">— Selecione —</option>
+              <option>Simples Nacional</option><option>Lucro Presumido</option><option>Lucro Real</option><option>MEI</option>
+            </select>
+          </div>
+        </div>
+        <div class="f-group"><label class="f-label">Endereço completo</label><input class="f-input" type="text" id="ct_endereco" placeholder="Rua, nº, bairro, cidade/UF, CEP"></div>
+        <div class="g2">
+          <div class="f-group"><label class="f-label">Representante legal</label><input class="f-input" type="text" id="ct_resp" placeholder="Nome do sócio"></div>
+          <div class="f-group"><label class="f-label">CPF do representante</label><input class="f-input" type="text" id="ct_cpf" placeholder="000.000.000-00"></div>
+        </div>
+        <div class="g2">
+          <div class="f-group"><label class="f-label">📱 WhatsApp / Telefone</label><input class="f-input" type="text" id="ct_telefone" placeholder="(21) 99999-9999" oninput="maskPhone(this)"></div>
+          <div class="f-group"><label class="f-label">E-mail</label><input class="f-input" type="email" id="ct_email" placeholder="contato@empresa.com.br"></div>
+        </div>
+      </div>
+
+      <div class="card" style="margin-bottom:10px">
+        <div style="font-family:'Syne',sans-serif;font-weight:700;font-size:.85rem;color:var(--text);margin-bottom:10px">🏛️ Contratado (preenchido)</div>
+        <div class="f-group"><label class="f-label">Nome da Consultoria</label><input class="f-input" type="text" id="ct_escritorio" value="PB Tecnologia e Inteligência Tributária"></div>
+        <div class="g2">
+          <div class="f-group"><label class="f-label">CNPJ da Consultoria</label><input class="f-input" type="text" id="ct_cnpj_esc" value="32.779.278/0001-03"></div>
+          <div class="f-group"><label class="f-label">Registro (CRC/CRA)</label><input class="f-input" type="text" id="ct_crc" placeholder="CRC-XX 000.000/O-0"></div>
+        </div>
+        <div class="f-group"><label class="f-label">Endereço da Consultoria</label><input class="f-input" type="text" id="ct_endereco_esc" placeholder="Rua, nº, bairro, cidade/UF, CEP"></div>
+        <div class="f-group"><label class="f-label">Consultor responsável</label><input class="f-input" type="text" id="ct_consultor" placeholder="Nome do consultor"></div>
+      </div>
+
+      <div class="card" style="margin-bottom:10px">
+        <div style="font-family:'Syne',sans-serif;font-weight:700;font-size:.85rem;color:var(--text);margin-bottom:10px">📋 Complemento do contrato</div>
+        <div class="f-group"><label class="f-label">Serviço contratado</label>
+          <select class="f-input" id="ct_objeto">
+            <option>Diagnóstico Tributário RT 360° — LC 214/2025</option>
+            <option>Planejamento Tributário — Reforma Tributária</option>
+            <option>Consultoria Tributária Continuada — RT</option>
+            <option>Revisão e Classificação NCM/NBS</option>
+          </select>
+        </div>
+        <div class="f-group"><label class="f-label">Valor dos honorários</label>
+          <input class="f-input" type="text" id="ct_valor" placeholder="Preenchido ao selecionar faixa acima" readonly style="opacity:.7">
+        </div>
+        <div class="g2">
+          <div class="f-group"><label class="f-label">Prazo de entrega</label>
+            <input class="f-input" type="text" id="ct_prazo" value="20 dias úteis">
+          </div>
+          <div class="f-group"><label class="f-label">Foro de eleição</label>
+            <input class="f-input" type="text" id="ct_foro" value="Rio de Janeiro/RJ">
+          </div>
+        </div>
+        <div class="f-group"><label class="f-label">Cidade e data de assinatura</label>
+          <input class="f-input" type="text" id="ct_cidade" id="ct_cidade_field" placeholder="Rio de Janeiro, DD de mês de AAAA">
+        </div>
+      </div>
+
+      <button onclick="gerarContrato()"
+        style="width:100%;padding:12px;border-radius:10px;background:linear-gradient(135deg,var(--gold),var(--gold2));
+        color:#000;font-family:'Syne',sans-serif;font-weight:800;font-size:.9rem;cursor:pointer;border:none;transition:all .2s"
+        onmouseover="this.style.opacity='.88'" onmouseout="this.style.opacity='1'">
+        📄 Gerar Contrato Completo →
+      </button>
+    </div>
+
+    <!-- PREVIEW CONTRATO -->
+    <div class="doc-col" id="doc-col">
+      <div class="doc-empty" id="doc-empty">
+        <div style="font-size:3rem">📄</div>
+        <div style="font-family:'Syne',sans-serif;font-weight:700;font-size:.9rem;color:var(--text2)">Contrato aparece aqui</div>
+        <div style="font-size:.78rem;margin-top:4px">Preencha os dados do cliente<br>e clique em Gerar Contrato</div>
+        <div style="margin-top:16px;padding:12px 16px;background:rgba(0,255,157,.06);border:1px solid rgba(0,255,157,.2);border-radius:8px;font-size:.75rem;color:var(--green);text-align:left;line-height:1.6">
+          💡 <strong>Dica:</strong> O QR Code PIX já funciona<br>sem preencher o contrato.<br>Use o painel acima para pagar na hora.
+        </div>
+      </div>
+      <div id="doc-out" style="display:none"></div>
+    </div>
+  </div>
+</div>
+</div>
+
+</div><!-- /wrap -->
+
+<!-- NAVBAR -->
+<div class="navbar">
+  <div class="nb-left">
+    <div class="nb-brand">PBSmart · Diagnóstico RT</div>
+    <div class="nb-counter" id="counter">1 / 6</div>
+    <div id="autosave-dot" title="Rascunho salvo automaticamente"></div>
+    <span id="autosave-lbl" style="font-size:.6rem;color:var(--text3);font-family:'DM Mono',monospace"></span>
+  </div>
+  <div class="dots" id="dots"></div>
+  <div class="nb-btns" style="display:flex;align-items:center;gap:8px">
+    <span class="timer-countdown" id="timer-countdown"></span>
+    <button class="btn btn-outline" onclick="prev()" id="btn-prev">← Voltar</button>
+    <button class="btn btn-gold" onclick="next()" id="btn-next">Próximo →</button>
+    <button class="btn btn-ghost" onclick="toggleAuto()" id="btn-auto">▶ Auto</button>
+    <button class="btn-fs" onclick="toggleFullscreen()" id="btn-fs" title="Tela cheia (F11)">⛶</button>
+  </div>
+</div>
+
+<!-- DRAFT BANNER -->
+<div id="draft-banner">
+  <div id="autosave-dot-banner" style="width:8px;height:8px;border-radius:50%;background:var(--gold);flex-shrink:0"></div>
+  <div>
+    <div style="font-weight:700;font-size:.8rem;color:var(--gold)">Rascunho encontrado</div>
+    <div style="font-size:.72rem;color:var(--text2)" id="draft-info">Dados de uma reunião anterior</div>
+  </div>
+  <button class="draft-btn draft-restore" onclick="restoreDraft()">↩ Restaurar</button>
+  <button class="draft-btn draft-discard" onclick="discardDraft()">✕ Descartar</button>
+</div>
+
+<!-- MODAL PIX -->
+<div class="modal-over" id="pix-modal">
+  <div class="modal-box">
+    <button class="modal-close" onclick="closePix()">✕</button>
+    <div style="text-align:center">
+      <div style="font-family:'Syne',sans-serif;font-weight:800;font-size:1.1rem;color:var(--green);margin-bottom:4px">📱 Pagamento via PIX</div>
+      <div style="font-size:.78rem;color:var(--text2);margin-bottom:18px">PB Tecnologia e Inteligência Tributária</div>
+      <div style="background:var(--bg3);border:1px solid rgba(0,255,157,.2);border-radius:12px;padding:20px;margin-bottom:14px">
+        <div style="font-size:.68rem;color:var(--text3);font-family:'DM Mono',monospace;margin-bottom:8px;text-transform:uppercase;letter-spacing:.1em">Chave PIX — CNPJ</div>
+        <div style="font-family:'DM Mono',monospace;font-size:.95rem;color:var(--text);background:var(--bg);border:1px solid var(--border);border-radius:7px;padding:9px 14px;margin-bottom:10px;letter-spacing:.05em">32.779.278/0001-03</div>
+        <div id="pix-modal-valor" style="display:none;margin-bottom:10px">
+          <div style="font-size:.65rem;color:var(--text3);font-family:'DM Mono',monospace;text-transform:uppercase;letter-spacing:.08em;margin-bottom:4px">Valor da entrada / 1ª parcela</div>
+          <div style="font-family:'Syne',sans-serif;font-weight:800;font-size:1.8rem;color:var(--green)" id="pix-modal-valor-num">—</div>
+          <div style="font-size:.68rem;color:var(--text3);margin-top:2px" id="pix-modal-desc">—</div>
+        </div>
+        <div style="background:#fff;border-radius:10px;padding:10px;display:inline-block" id="pix-qr"></div>
+        <div style="font-size:.72rem;color:var(--text3);margin-top:10px">Após confirmação do pagamento<br>o acesso ao serviço é liberado imediatamente</div>
+      </div>
+      <button onclick="closePix()" class="btn btn-outline" style="width:100%;justify-content:center">Fechar</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// ─── NAVEGAÇÃO ───
+const SLIDES = document.querySelectorAll('.slide');
+const N = SLIDES.length;
+let cur = 0, autoOn = false, autoTimer = null;
+const ADUR = 22000;
+
+function initDots(){
+  const d = document.getElementById('dots'); d.innerHTML='';
+  for(let i=0;i<N;i++){
+    const dot=document.createElement('div');
+    dot.className='dot'+(i===0?' active':'');
+    dot.onclick=()=>go(i); d.appendChild(dot);
+  }
+}
+function updateUI(){
+  document.getElementById('counter').textContent=(cur+1)+' / '+N;
+  document.querySelectorAll('.dot').forEach((d,i)=>{
+    d.className='dot'+(i===cur?' active':i<cur?' done':'');
+  });
+  document.getElementById('btn-prev').disabled=cur===0;
+  document.getElementById('btn-next').textContent=cur===N-1?'🔄 Reiniciar':'Próximo →';
+}
+function go(n){
+  if(n<0)n=0; if(n>=N){go(0);return;}
+  SLIDES[cur].classList.remove('active');
+  SLIDES[cur].classList.add('out');
+  const prev=cur; setTimeout(()=>SLIDES[prev].classList.remove('out'),550);
+  cur=n; SLIDES[cur].classList.add('active'); updateUI(); resetTimer();
+  if(n===3) setTimeout(buildRptMenu,80);
+}
+function next(){go(cur===N-1?0:cur+1);}
+function prev(){go(cur-1);}
+function resetTimer(){
+  document.getElementById('tfill').style.width='0%';
+  clearInterval(autoTimer);
+  if(autoOn){
+    let w=0;
+    autoTimer=setInterval(()=>{
+      w+=100/(ADUR/120); document.getElementById('tfill').style.width=Math.min(w,100)+'%';
+      if(w>=100) next();
+    },120);
+  }
+}
+function toggleAuto(){
+  autoOn=!autoOn;
+  document.getElementById('btn-auto').textContent=autoOn?'⏸ Pausar':'▶ Auto';
+  resetTimer();
+  // Countdown display
+  clearInterval(window._cdTimer);
+  if(autoOn){
+    let elapsed=0;
+    window._cdTimer=setInterval(()=>{
+      elapsed+=200;
+      updateCountdown(ADUR-elapsed);
+      if(elapsed>=ADUR) elapsed=0;
+    },200);
+  } else {
+    updateCountdown(0);
+  }
+}
+document.addEventListener('keydown',e=>{
+  if(['INPUT','SELECT','TEXTAREA'].includes(document.activeElement.tagName))return;
+  if(e.key==='ArrowRight'||e.key===' '){e.preventDefault();next();}
+  if(e.key==='ArrowLeft'){e.preventDefault();prev();}
+  if(e.key==='Escape') closePix();
+});
+
+// ─── SIMULADOR ───
+const FAIXAS = [
+  {fat:50000, regime_np:{simples:.055,presumido:.0925,real:.0925}, aliq_rt:0.265, reducao:0, setor_mult:1},
+  {fat:80000, regime_np:{simples:.055,presumido:.0925,real:.0925}, aliq_rt:0.265, reducao:0, setor_mult:1},
+  {fat:200000, regime_np:{simples:.06,presumido:.0925,real:.0925}, aliq_rt:0.265, reducao:0, setor_mult:1},
+  {fat:450000, regime_np:{simples:.065,presumido:.0925,real:.0925}, aliq_rt:0.265, reducao:0, setor_mult:1},
+  {fat:700000, regime_np:{simples:0,presumido:.0925,real:.0925}, aliq_rt:0.265, reducao:0, setor_mult:1},
+  {fat:1100000, regime_np:{simples:0,presumido:.0925,real:.0925}, aliq_rt:0.265, reducao:0, setor_mult:1},
+  {fat:2000000, regime_np:{simples:0,presumido:.0925,real:.0925}, aliq_rt:0.265, reducao:0, setor_mult:1},
+];
+const SETOR_DATA = {
+  comercio:  {reducao:0,    split:.55, credito:.62, label:'Comércio — sem redução específica'},
+  industria: {reducao:0,    split:.5,  credito:.58, label:'Indústria — crédito amplo na cadeia'},
+  servicos:  {reducao:.30,  split:.45, credito:.40, label:'Serviços — redução 30% (Art.127 LC 214/2025)'},
+  saude:     {reducao:.60,  split:.40, credito:.50, label:'Saúde — redução 60% (Art.130 LC 214/2025)'},
+  educacao:  {reducao:.60,  split:.38, credito:.42, label:'Educação — redução 60% (Art.131 LC 214/2025)'},
+  construcao:{reducao:.30,  split:.52, credito:.55, label:'Construção Civil — redução 30% (Art.132)'},
+  ti:        {reducao:.30,  split:.48, credito:.45, label:'Tecnologia/SaaS — redução 30% (Art.127)'},
+  agro:      {reducao:1.0,  split:.20, credito:.80, label:'Agronegócio — alíquota zero (Art.124 LC 214/2025)'},
+};
+function fmt(v){return 'R$ '+Math.round(v).toLocaleString('pt-BR')}
+function simCalc(){
+  const fatV=document.getElementById('sim_fat').value;
+  const regime=document.getElementById('sim_regime').value;
+  const setor=document.getElementById('sim_setor').value;
+  const simplPct=parseInt(document.getElementById('sim_simples_pct').value)/100;
+  if(!fatV||!regime||!setor){
+    document.getElementById('sim_results').style.display='none';
+    document.getElementById('sim_placeholder').style.display='flex';
+    return;
+  }
+  const fat=parseFloat(fatV);
+  const sd=SETOR_DATA[setor];
+  const aliqAtual=regime==='simples'?0.055:(regime==='presumido'?0.0925:0.0825);
+  const aliqRT=0.265*(1-sd.reducao);
+  const isZero=sd.reducao>=1.0;
+  const exposicao=isZero?0:fat*aliqRT;
+  const creditoBase=isZero?0:fat*aliqRT*sd.credito;
+  const perdaSimples=isZero?0:fat*0.12*simplPct*0.55;
+  const credLiq=Math.max(0,creditoBase-perdaSimples);
+  const liquido=isZero?0:exposicao-credLiq;
+  const splitImpact=isZero?fat*sd.split*0.001:exposicao*sd.split; // agro split mínimo
+  const perdaAnual=liquido*12;
+  document.getElementById('r_exposicao').textContent=isZero?'R$ 0 — Alíq. Zero':fmt(exposicao);
+  document.getElementById('r_creditos').textContent=isZero?'Não se aplica':fmt(credLiq);
+  document.getElementById('r_liquido').textContent=isZero?'R$ 0 (benefício total)':fmt(liquido);
+  document.getElementById('r_split').textContent=isZero?'Impacto mínimo':fmt(splitImpact);
+  document.getElementById('r_perda_anual').textContent=isZero?'R$ 0 — setor isento':fmt(perdaAnual);
+  const pctAtual=(aliqAtual*100).toFixed(1)+'%';
+  const pctRT=isZero?'0% (Alíquota Zero)':(aliqRT*100).toFixed(1)+'%';
+  const wAtual=Math.min(100,(aliqAtual/0.30)*100);
+  const wRT=isZero?0:Math.min(100,(aliqRT/0.30)*100);
+  document.getElementById('r_bar_atual').style.width=wAtual+'%';
+  document.getElementById('r_bar_atual').textContent=pctAtual+' atual';
+  document.getElementById('r_bar_2033').style.width=Math.max(wRT,2)+'%';
+  document.getElementById('r_bar_2033').textContent=pctRT+' RT 2033';
+  document.getElementById('sim_results').style.display='block';
+  document.getElementById('sim_placeholder').style.display='none';
+  // Alerta setor
+  const al=document.getElementById('sim_alerta');
+  if(sd.reducao>0){
+    al.style.display='block';
+    al.innerHTML=`<div class="alert alert-green">✅ <div><strong>${sd.label}</strong> — esta redução pode ser aproveitada no seu diagnóstico para reduzir a carga efetiva.</div></div>`;
+  } else {
+    al.style.display='none';
+  }
+}
+
+// ─── ROI ───
+const ROI_DATA=[
+  {inv:4800,  fat_med:70000,  risco_anual:32000,  economia:8800},
+  {inv:6800,  fat_med:200000, risco_anual:68000,  economia:22000},
+  {inv:8800,  fat_med:450000, risco_anual:140000, economia:46000},
+  {inv:10800, fat_med:700000, risco_anual:210000, economia:68000},
+  {inv:12800, fat_med:1100000,risco_anual:320000, economia:105000},
+];
+function calcROI(){
+  const idx=parseInt(document.getElementById('roi_fat').value);
+  if(isNaN(idx)||idx===''){
+    document.getElementById('roi_result').style.display='none';
+    document.getElementById('roi_placeholder').style.display='flex';
+    // limpar highlight
+    document.querySelectorAll('#price-table tbody tr').forEach(r=>r.classList.remove('highlight-row'));
+    return;
+  }
+  const d=ROI_DATA[idx];
+  document.getElementById('roi_result').style.display='block';
+  document.getElementById('roi_placeholder').style.display='none';
+  document.getElementById('roi_economia').textContent=fmt(d.economia)+'/mês';
+  const roi=((d.economia*12-d.inv)/d.inv*100).toFixed(0);
+  document.getElementById('roi_val').textContent=roi+'%';
+  document.getElementById('roi_desc').textContent='Retorno sobre investimento em 12 meses';
+  const wInv=Math.round((d.inv/d.risco_anual)*100);
+  document.getElementById('roi_bar_risco').style.width='100%';
+  document.getElementById('roi_bar_risco').textContent=fmt(d.risco_anual)+'/ano';
+  document.getElementById('roi_bar_inv').style.width=Math.max(wInv,4)+'%';
+  document.getElementById('roi_bar_inv').textContent=fmt(d.inv);
+  // highlight table row
+  document.querySelectorAll('#price-table tbody tr').forEach((r,i)=>{
+    r.classList.toggle('highlight-row',i===idx);
+  });
+}
+
+// ─── CONTRATO ───
+function maskDoc(el){
+  let v=el.value.replace(/\D/g,'');
+  if(v.length<=11) v=v.replace(/(\d{3})(\d{3})(\d{3})(\d{2})/,'$1.$2.$3-$4');
+  else v=v.replace(/(\d{2})(\d{3})(\d{3})(\d{4})(\d{2})/,'$1.$2.$3/$4-$5');
+  el.value=v;
+}
+function ctSetValor(){
+  const v=document.getElementById('ct_faixa').value;
+  if(v==='0') document.getElementById('ct_valor').value='À combinar';
+  else if(v) document.getElementById('ct_valor').value='R$ '+parseInt(v).toLocaleString('pt-BR');
+  ctCalcParcela();
+}
+function ctCalcParcela(){
+  const faixa=document.getElementById('ct_faixa').value;
+  const parcN=parseInt(document.getElementById('ct_parcelas').value)||1;
+  const box=document.getElementById('ct_parcela_box');
+  const btnRapido=document.getElementById('btn-pix-rapido');
+  if(!faixa||faixa==='0'){
+    box.style.display='none';
+    if(btnRapido){btnRapido.style.opacity='.4';btnRapido.style.pointerEvents='none';}
+    return;
+  }
+  const total=parseInt(faixa);
+  const parcVal=Math.round(total/parcN);
+  box.style.display='block';
+  if(btnRapido){btnRapido.style.opacity='1';btnRapido.style.pointerEvents='auto';}
+  document.getElementById('cp_total').textContent='R$ '+total.toLocaleString('pt-BR');
+  document.getElementById('cp_parcelas').textContent=parcN===1?'À vista':parcN+'x de R$ '+parcVal.toLocaleString('pt-BR');
+  document.getElementById('cp_pix').textContent='R$ '+parcVal.toLocaleString('pt-BR');
+  window._pixEntrada=parcVal;
+  window._pixTotal=total;
+  window._pixParcN=parcN;
+}
+function getPixEntrada(){
+  const faixa=document.getElementById('ct_faixa').value;
+  const parcN=parseInt(document.getElementById('ct_parcelas').value)||1;
+  if(!faixa||faixa==='0') return null;
+  return {valor:Math.round(parseInt(faixa)/parcN), parcN, total:parseInt(faixa)};
+}
+function gerarContrato(){
+  const nome=document.getElementById('ct_nome').value.trim();
+  if(!nome){alert('Informe a Razão Social do contratante.');return;}
+  const cnpj=document.getElementById('ct_cnpj').value.trim();
+  const regime=document.getElementById('ct_regime').value;
+  const endereco=document.getElementById('ct_endereco').value.trim();
+  const resp=document.getElementById('ct_resp').value.trim();
+  const cpf=document.getElementById('ct_cpf').value.trim();
+  const escritorio=document.getElementById('ct_escritorio').value.trim()||'PB Tecnologia e Inteligência Tributária';
+  const cnpjEsc=document.getElementById('ct_cnpj_esc').value.trim()||'32.779.278/0001-03';
+  const crc=document.getElementById('ct_crc').value.trim();
+  const consultor=document.getElementById('ct_consultor').value.trim();
+  const enderecoEsc=document.getElementById('ct_endereco_esc').value.trim();
+  const objeto=document.getElementById('ct_objeto').value;
+  const valor=document.getElementById('ct_valor').value.trim()||'(a definir)';
+  const parcN=parseInt(document.getElementById('ct_parcelas').value)||1;
+  const prazo=document.getElementById('ct_prazo').value.trim()||'20 dias úteis';
+  const cidadeEl = document.getElementById('ct_cidade_field');
+  const cidade = cidadeEl ? cidadeEl.value.trim() : getDataHoje();
+  const telefone2 = document.getElementById('ct_telefone').value.trim();
+  const email2 = document.getElementById('ct_email').value.trim();
+  const foro=document.getElementById('ct_foro').value.trim()||'Rio de Janeiro/RJ';
+  // Atualiza cidade com data de hoje se vazio
+  if(document.getElementById('ct_cidade_field') && !document.getElementById('ct_cidade_field').value){ document.getElementById('ct_cidade_field').value=getCidadeHoje(); }
+  const cnpjKey=cnpjEsc.replace(/\D/g,'')||'32779278000103';
+  // Calcula parcela / entrada para o PIX
+  const faixa=document.getElementById('ct_faixa').value;
+  const totalNum=faixa&&faixa!=='0'?parseInt(faixa):0;
+  const parcValNum=totalNum>0?Math.round(totalNum/parcN):0;
+  const pagTexto=parcN===1?'à vista (PIX)':`em ${parcN}x de R$ ${parcValNum.toLocaleString('pt-BR')} (mensal), com entrada de R$ ${parcValNum.toLocaleString('pt-BR')} na assinatura`;
+  const pixValorLabel=parcValNum>0?'R$ '+parcValNum.toLocaleString('pt-BR'):'(a combinar)';
+  const pixQrText=parcValNum>0?cnpjKey+'?amount='+parcValNum.toFixed(2):cnpjKey;
+
+  document.getElementById('doc-empty').style.display='none';
+  const out=document.getElementById('doc-out');
+  out.style.display='block';
+  out.innerHTML=`
+<div class="ct-doc">
+  <div class="ct-header">
+    <div class="ct-logo-txt">PBSmart</div>
+    <div class="ct-title">CONTRATO DE PRESTAÇÃO DE SERVIÇOS</div>
+    <div class="ct-subtitle">DIAGNÓSTICO E CONSULTORIA TRIBUTÁRIA — REFORMA TRIBUTÁRIA LC 214/2025<br>COM CLÁUSULA DE SIGILO E CONFIDENCIALIDADE (NDA)</div>
+  </div>
+
+  <div class="ct-h2">QUALIFICAÇÃO DAS PARTES</div>
+  <div class="ct-parties-box">
+    <strong>CONTRATANTE:</strong> ${nome}${cnpj?' — CNPJ: '+cnpj:''}<br>
+    ${regime?'Regime: '+regime+'<br>':''}
+    ${endereco?'Endereço: '+endereco+'<br>':''}
+    ${resp?'Representante: '+resp+(cpf?' — CPF: '+cpf:'')+'<br>':''}
+    <br>
+    <strong>CONTRATADO:</strong> ${escritorio}${cnpjEsc?' — CNPJ: '+cnpjEsc:''}<br>
+    ${enderecoEsc?'Endereço: '+enderecoEsc+'<br>':''}
+    ${crc?'Registro Profissional: '+crc+'<br>':''}
+    ${consultor?'Consultor Responsável: '+consultor+'<br>':''}
+  </div>
+
+  <div class="ct-h2">CLÁUSULA 1ª — OBJETO</div>
+  <p class="ct-p">1.1. O presente instrumento tem por objeto a prestação de serviços de <strong>${objeto}</strong>, compreendendo análise tributária personalizada com base nas disposições da Lei Complementar nº 214/2025 e Emenda Constitucional nº 132/2023 — Reforma Tributária.</p>
+  <p class="ct-p">1.2. Os serviços incluem: diagnóstico de impacto CBS/IBS/IS, classificação NCM/NBS, simulação de Split Payment, análise de cadeia de fornecedores, projeção de créditos tributários, formação de preços e planejamento tributário com entrega de relatório executivo em PDF.</p>
+  <p class="ct-p">1.3. Os serviços têm natureza consultiva e analítica, não constituindo assessoria jurídica ou representação perante o Fisco.</p>
+
+  <div class="ct-h2">CLÁUSULA 2ª — HONORÁRIOS E PAGAMENTO</div>
+  <p class="ct-p">2.1. Pelos serviços ora contratados, o CONTRATANTE pagará ao CONTRATADO o valor total de <strong>${valor}</strong>, ${pagTexto}.</p>
+  <p class="ct-p">2.2. O pagamento será realizado via PIX — Chave CNPJ: <strong>${cnpjEsc||'32.779.278/0001-03'}</strong> — valor da entrada/1ª parcela: <strong>${pixValorLabel}</strong>. As demais parcelas, quando aplicável, vencem mensalmente na mesma data.</p>
+  <p class="ct-p">2.3. O prazo de execução e entrega do relatório é de <strong>${prazo}</strong>, contados da assinatura e confirmação do pagamento da entrada.</p>
+  <p class="ct-p">2.4. Em caso de inadimplemento por mais de 15 dias, o contrato será rescindido de pleno direito, sem prejuízo de multa de 20% sobre o saldo devedor e honorários advocatícios.</p>
+
+  <div class="ct-h2">CLÁUSULA 3ª — OBRIGAÇÕES DO CONTRATADO</div>
+  <p class="ct-p">3.1. Executar os serviços com diligência, expertise técnica e em conformidade com a legislação tributária vigente (LC 214/2025).</p>
+  <p class="ct-p">3.2. Entregar o relatório de diagnóstico no prazo acordado, contendo todos os elementos descritos na Cláusula 1ª.</p>
+  <p class="ct-p">3.3. Manter em sigilo absoluto todas as informações recebidas do CONTRATANTE para fins de execução dos serviços.</p>
+
+  <div class="ct-h2">CLÁUSULA 4ª — OBRIGAÇÕES DO CONTRATANTE</div>
+  <p class="ct-p">4.1. Fornecer ao CONTRATADO, em tempo hábil, todos os documentos e informações necessários: escriturações fiscais, notas fiscais, contratos vigentes, relatórios contábeis e dados operacionais relevantes.</p>
+  <p class="ct-p">4.2. Efetuar o pagamento nos termos acordados na Cláusula 2ª.</p>
+  <p class="ct-p">4.3. Não contratar, durante a vigência e pelos 12 meses seguintes ao encerramento, profissionais da equipe do CONTRATADO para prestação de serviços similares.</p>
+
+  <div class="ct-h2">CLÁUSULA 5ª — NDA / CONFIDENCIALIDADE</div>
+  <p class="ct-p">5.1. As partes se obrigam a manter em absoluto sigilo todas as informações confidenciais obtidas em razão deste contrato, incluindo dados financeiros, contábeis, fiscais, estratégicos, listas de clientes e fornecedores, e processos internos.</p>
+  <p class="ct-p">5.2. As obrigações de sigilo têm vigência por prazo indeterminado, mesmo após o término ou rescisão deste contrato.</p>
+  <p class="ct-p">5.3. O descumprimento do dever de sigilo sujeita a parte infratora a indenização por perdas e danos, sem prejuízo das sanções civis e penais cabíveis.</p>
+
+  <div class="ct-h2">CLÁUSULA 6ª — LGPD</div>
+  <p class="ct-p">6.1. As partes declaram-se cientes da Lei nº 13.709/2018 (LGPD) e comprometem-se a tratar os dados pessoais recebidos exclusivamente para os fins deste contrato, adotando medidas de segurança adequadas.</p>
+
+  <div class="ct-h2">CLÁUSULA 7ª — DISPOSIÇÕES GERAIS</div>
+  <p class="ct-p">7.1. O presente instrumento constitui o acordo integral entre as partes, substituindo quaisquer entendimentos anteriores, verbais ou escritos.</p>
+  <p class="ct-p">7.2. Qualquer alteração só será válida mediante instrumento escrito assinado por ambas as partes.</p>
+  <p class="ct-p">7.3. As partes elegem o foro da Comarca de <strong>${foro}</strong> para dirimir quaisquer litígios, renunciando expressamente a qualquer outro, por mais privilegiado que seja.</p>
+  <p class="ct-p" style="margin-top:10px;text-align:center">E, por estarem assim justas e contratadas, as partes assinam o presente em 2 (duas) vias.</p>
+
+  <div style="text-align:center;font-size:9pt;color:#666;margin:12px 0">${cidade}</div>
+
+  <div class="ct-sign">
+    <div class="ct-sign-blk">
+      <div class="sig-canvas-wrap" id="sig-wrap-cliente">
+        <canvas id="sig-canvas-cliente" height="70"></canvas>
+        <button class="sig-clear" onclick="clearSig('cliente')" type="button">✕ limpar</button>
+      </div>
+      <div class="sig-label">Assine acima com o mouse ou dedo</div>
+      <div class="ct-sign-name" style="margin-top:6px">${nome||'CONTRATANTE'}</div>
+      <div class="ct-sign-role">${resp?resp+' — ':''}Representante Legal</div>
+    </div>
+    <div class="ct-sign-blk">
+      <div class="sig-canvas-wrap" id="sig-wrap-consultor">
+        <canvas id="sig-canvas-consultor" height="70"></canvas>
+        <button class="sig-clear" onclick="clearSig('consultor')" type="button">✕ limpar</button>
+      </div>
+      <div class="sig-label">Assine acima com o mouse ou dedo</div>
+      <div class="ct-sign-name" style="margin-top:6px">${escritorio}</div>
+      <div class="ct-sign-role">${consultor?consultor+' — ':''}CONTRATADO${crc?' · '+crc:''}</div>
+    </div>
+  </div>
+
+  <div class="ct-pix">
+    <div class="ct-pix-title">📱 PIX — Entrada / 1ª Parcela — ${escritorio}</div>
+    <div style="font-family:'Arial',sans-serif;font-size:9pt;color:#004422;margin-bottom:4px">Chave CNPJ: <strong>${cnpjEsc||'32.779.278/0001-03'}</strong></div>
+    <div style="background:#fff;display:inline-block;font-family:'Arial Black',sans-serif;font-size:22pt;font-weight:900;color:#004422;border:2px solid #99ddbb;border-radius:8px;padding:4px 20px;margin:6px 0">${pixValorLabel}</div>
+    <div class="ct-pix-key" style="margin:4px 0">${cnpjEsc||'32.779.278/0001-03'}</div>
+    <div id="qr-contrato" style="width:130px;height:130px;background:#fff;padding:6px;border-radius:8px;margin:6px auto"></div>
+    <div class="ct-pix-note">Valor da <strong>entrada (1ª parcela)</strong> — escaneie para pagar<br>${parcN===1?'Pagamento à vista — valor total':'Demais parcelas vencem mensalmente na mesma data'}<br>O início dos trabalhos será imediato após confirmação</div>
+  </div>
+
+  <div class="ct-footer">
+    Contrato gerado · ${escritorio} · ${cnpjEsc} · PBSmart Diagnóstico RT · LC 214/2025
+  </div>
+</div>
+<div class="ct-action-bar">
+  <button class="ct-action-btn ct-btn-print" onclick="imprimirContrato()">🖨️ Imprimir / Salvar PDF</button>
+  <button class="ct-action-btn ct-btn-wpp" onclick="enviarWhatsapp()">💬 Enviar por WhatsApp</button>
+  <button class="ct-action-btn ct-btn-email" onclick="enviarEmail()">✉️ Enviar por E-mail</button>
+</div>`;
+
+  setTimeout(()=>{
+    const el=document.getElementById('qr-contrato');
+    if(el){ el.innerHTML='';
+      try{ new QRCode(el,{text:pixQrText,width:118,height:118,colorDark:'#0d1117',colorLight:'#fff',correctLevel:QRCode.CorrectLevel.M}); }catch(e){}
+    }
+    initAllSigs();
+  },200);
+}
+
+
+// ─── ASSINATURA DIGITAL ───
+const sigState = {
+  cliente: {drawing:false, ctx:null, hasData:false},
+  consultor: {drawing:false, ctx:null, hasData:false}
+};
+
+function initSig(id){
+  const canvas = document.getElementById('sig-canvas-'+id);
+  if(!canvas) return;
+  const wrap = canvas.parentElement;
+  // Match canvas pixel size to display size
+  const rect = wrap.getBoundingClientRect();
+  canvas.width = Math.max(rect.width * devicePixelRatio, 300);
+  canvas.height = 70 * devicePixelRatio;
+  const ctx = canvas.getContext('2d');
+  ctx.scale(devicePixelRatio, devicePixelRatio);
+  ctx.strokeStyle = '#1a2340';
+  ctx.lineWidth = 1.8;
+  ctx.lineCap = 'round';
+  ctx.lineJoin = 'round';
+  sigState[id].ctx = ctx;
+
+  function pos(e){
+    const r = canvas.getBoundingClientRect();
+    const src = e.touches ? e.touches[0] : e;
+    return {x:(src.clientX-r.left), y:(src.clientY-r.top)};
+  }
+  function start(e){e.preventDefault();sigState[id].drawing=true;const p=pos(e);ctx.beginPath();ctx.moveTo(p.x,p.y);}
+  function move(e){e.preventDefault();if(!sigState[id].drawing)return;const p=pos(e);ctx.lineTo(p.x,p.y);ctx.stroke();sigState[id].hasData=true;}
+  function end(e){e.preventDefault();sigState[id].drawing=false;}
+
+  canvas.addEventListener('mousedown',start);
+  canvas.addEventListener('mousemove',move);
+  canvas.addEventListener('mouseup',end);
+  canvas.addEventListener('mouseleave',end);
+  canvas.addEventListener('touchstart',start,{passive:false});
+  canvas.addEventListener('touchmove',move,{passive:false});
+  canvas.addEventListener('touchend',end,{passive:false});
+}
+
+function clearSig(id){
+  const s=sigState[id];
+  if(!s.ctx) return;
+  const canvas=document.getElementById('sig-canvas-'+id);
+  s.ctx.clearRect(0,0,canvas.width,canvas.height);
+  s.hasData=false;
+}
+
+function initAllSigs(){
+  setTimeout(()=>{initSig('cliente');initSig('consultor');},150);
+}
+
+// ─── IMPRIMIR / PDF ───
+function imprimirContrato(){
+  const src = document.getElementById('doc-out');
+  if(!src || src.style.display==='none' || !src.innerHTML.trim()){
+    alert('Gere o contrato primeiro clicando em "Gerar Contrato Completo".');
+    return;
+  }
+  const area = document.getElementById('print-contract-area');
+  // Clone the contract content (including canvas signatures)
+  area.innerHTML = '';
+  const clone = src.cloneNode(true);
+  // Copy canvas image data to cloned canvases
+  ['cliente','consultor'].forEach(id=>{
+    const orig = document.getElementById('sig-canvas-'+id);
+    const dest = clone.querySelector('#sig-canvas-'+id);
+    if(orig && dest){
+      dest.width = orig.width;
+      dest.height = orig.height;
+      const ctx = dest.getContext('2d');
+      ctx.drawImage(orig, 0, 0);
+    }
+  });
+  // Remove action bar from clone
+  const bar = clone.querySelector('.ct-action-bar');
+  if(bar) bar.remove();
+  area.appendChild(clone);
+  area.style.display = 'block';
+  setTimeout(()=>{
+    window.print();
+    setTimeout(()=>{ area.style.display='none'; area.innerHTML=''; }, 500);
+  }, 200);
+}
+
+// ─── WHATSAPP ───
+function enviarWhatsapp(){
+  const nome=document.getElementById('ct_nome').value.trim()||'Cliente';
+  const escritorio=document.getElementById('ct_escritorio').value.trim()||'PB Tecnologia e Inteligência Tributária';
+  const valor=document.getElementById('ct_valor').value.trim()||'a combinar';
+  const faixa=document.getElementById('ct_faixa').value;
+  const parcN=parseInt(document.getElementById('ct_parcelas').value)||1;
+  const parcVal=faixa&&faixa!=='0'?Math.round(parseInt(faixa)/parcN):0;
+  const pixStr=parcVal>0?(parcN===1?'Pagamento à vista: R$ '+parcVal.toLocaleString('pt-BR'):'Entrada (1ª parcela): R$ '+parcVal.toLocaleString('pt-BR')+' de '+parcN+'x'):'Valor a combinar';
+
+  const msg=`Olá! Segue o resumo do contrato de consultoria tributária:
+
+📋 *Contrato de Consultoria Tributária RT*
+🏢 Contratante: *${nome}*
+🏛 Contratado: *${escritorio}*
+💰 Honorários: *${valor}*
+📱 ${pixStr}
+
+Chave PIX (CNPJ): *32.779.278/0001-03*
+
+O contrato completo foi assinado digitalmente em reunião. Após confirmação do pagamento iniciamos imediatamente os trabalhos. ✅
+
+*PBSmart Diagnóstico RT · LC 214/2025*`;
+
+  const telefone = document.getElementById('ct_telefone').value.replace(/\D/g,'');
+  const wppNum = telefone.length >= 10 ? '55'+telefone : '';
+  const url = 'https://wa.me/'+ wppNum +'?text='+encodeURIComponent(msg);
+  window.open(url,'_blank');
+}
+
+// ─── EMAIL ───
+function enviarEmail(){
+  const nome=document.getElementById('ct_nome').value.trim()||'Cliente';
+  const escritorio=document.getElementById('ct_escritorio').value.trim()||'PB Tecnologia e Inteligência Tributária';
+  const valor=document.getElementById('ct_valor').value.trim()||'a combinar';
+  const cnpjEsc=document.getElementById('ct_cnpj_esc').value.trim()||'32.779.278/0001-03';
+  const faixa=document.getElementById('ct_faixa').value;
+  const parcN=parseInt(document.getElementById('ct_parcelas').value)||1;
+  const parcVal=faixa&&faixa!=='0'?Math.round(parseInt(faixa)/parcN):0;
+  const pixStr=parcVal>0?(parcN===1?'Pagamento à vista: R$ '+parcVal.toLocaleString('pt-BR'):'Entrada (1ª parcela): R$ '+parcVal.toLocaleString('pt-BR')+' de '+parcN+'x'):'Valor a combinar';
+  const objeto=document.getElementById('ct_objeto').value;
+  const prazo=document.getElementById('ct_prazo').value||'20 dias úteis';
+
+  const subject=encodeURIComponent('Contrato de Consultoria Tributária RT — '+nome);
+  const body=encodeURIComponent(
+`Prezado(a),
+
+Conforme alinhado em reunião, segue o resumo do contrato de Diagnóstico Tributário — Reforma Tributária LC 214/2025.
+
+CONTRATO DE PRESTAÇÃO DE SERVIÇOS
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+Contratante : ${nome}
+Contratado  : ${escritorio} (CNPJ: ${cnpjEsc})
+Objeto      : ${objeto}
+Honorários  : ${valor}
+Pagamento   : ${pixStr}
+Prazo       : ${prazo}
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+Pagamento via PIX — Chave CNPJ: ${cnpjEsc}
+${pixStr}
+
+Após confirmação do pagamento os trabalhos serão iniciados imediatamente.
+
+Em caso de dúvidas, estamos à disposição.
+
+Atenciosamente,
+${escritorio}
+PBSmart Diagnóstico RT · LC 214/2025`
+  );
+  const emailDest = document.getElementById('ct_email').value.trim();
+  window.location.href='mailto:'+emailDest+'?subject='+subject+'&body='+body;
+}
+
+// ─── PIX MODAL ───
+let qrDone=false;
+function showPixModal(){
+  document.getElementById('pix-modal').classList.add('open');
+  // Atualiza valor dinâmico
+  const pix=getPixEntrada();
+  const vBox=document.getElementById('pix-modal-valor');
+  if(pix){
+    vBox.style.display='block';
+    document.getElementById('pix-modal-valor-num').textContent='R$ '+pix.valor.toLocaleString('pt-BR');
+    document.getElementById('pix-modal-desc').textContent=pix.parcN===1?'Pagamento à vista — total: R$ '+pix.total.toLocaleString('pt-BR'):'1ª parcela de '+pix.parcN+'x (total: R$ '+pix.total.toLocaleString('pt-BR')+')';
+  } else {
+    vBox.style.display='none';
+  }
+  // Regenera QR sempre que valor mudar
+  const el=document.getElementById('pix-qr'); el.innerHTML='';
+  qrDone=false;
+  setTimeout(()=>{
+    try{ new QRCode(el,{text:'32779278000103',width:160,height:160,colorDark:'#0d1117',colorLight:'#fff',correctLevel:QRCode.CorrectLevel.M});qrDone=true;}catch(e){}
+  },100);
+}
+function closePix(){ document.getElementById('pix-modal').classList.remove('open'); }
+
+
+// ─── RELATÓRIO MODELO ───
+const RPT_SECTIONS = [
+  {id:'s01',icon:'📊',title:'1. Sumário Executivo',tag:'Score de Risco',html:`
+    <div style="display:grid;grid-template-columns:auto 1fr;gap:20px;align-items:start;margin-bottom:16px">
+      <div style="width:80px;height:80px;border-radius:50%;border:3px solid #00bb77;display:flex;flex-direction:column;align-items:center;justify-content:center;background:#f0fff6">
+        <div style="font-family:'Syne',sans-serif;font-weight:900;font-size:1.8rem;color:#00aa66;line-height:1">10</div>
+        <div style="font-size:.6rem;color:#00aa66;font-weight:700">BAIXO</div>
+      </div>
+      <div>
+        <div style="font-family:'Syne',sans-serif;font-weight:800;font-size:1.1rem;color:#0d1117;margin-bottom:6px">Score de Risco RT: 10/100 — BAIXO</div>
+        <div style="font-size:.82rem;color:#334;line-height:1.6">Com base no perfil desta empresa de saúde, a Reforma Tributária representa um <strong>potencial alívio</strong> da carga tributária ao longo da transição.</div>
+      </div>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px">
+      <div style="background:#fff0f0;border:1px solid #ffcccc;border-radius:8px;padding:14px;text-align:center">
+        <div style="font-size:.65rem;color:#aa4422;font-family:'DM Mono',monospace;text-transform:uppercase;margin-bottom:4px">Carga Atual Estimada</div>
+        <div style="font-family:'Syne',sans-serif;font-weight:800;font-size:1.2rem;color:#cc2200">R$ 47.109</div>
+        <div style="font-size:.68rem;color:#aa4422">8,65% da receita/mês</div>
+      </div>
+      <div style="background:#f0fff6;border:1px solid #bde8cc;border-radius:8px;padding:14px;text-align:center">
+        <div style="font-size:.65rem;color:#226633;font-family:'DM Mono',monospace;text-transform:uppercase;margin-bottom:4px">CBS+IBS Plenos 2033</div>
+        <div style="font-family:'Syne',sans-serif;font-weight:800;font-size:1.2rem;color:#008833">R$ 34.939</div>
+        <div style="font-size:.68rem;color:#226633">6,42% carga efetiva após créditos</div>
+      </div>
+      <div style="background:#f0f7ff;border:1px solid #bcd5f5;border-radius:8px;padding:14px;text-align:center">
+        <div style="font-size:.65rem;color:#224488;font-family:'DM Mono',monospace;text-transform:uppercase;margin-bottom:4px">Melhor Regime 2033</div>
+        <div style="font-family:'Syne',sans-serif;font-weight:800;font-size:1.2rem;color:#1155bb">Lucro Presumido</div>
+        <div style="font-size:.68rem;color:#224488">R$ 92.193/mês estimados</div>
+      </div>
+    </div>
+    <div style="margin-top:12px;background:#f8f9ff;border-left:3px solid #C9A84C;border-radius:0 6px 6px 0;padding:12px 14px;font-size:.8rem;color:#334;line-height:1.6">
+      A carga atual estimada de <strong>R$ 47.109/mês</strong> passará para aproximadamente <strong>R$ 34.939/mês</strong> na fase plena (2033), representando uma redução de <strong style="color:#008833">−25,8%</strong>. O regime mais favorável identificado para 2033 é o <strong>Lucro Presumido</strong>.
+    </div>`
+  },
+  {id:'s02',icon:'📋',title:'2. Considerações Iniciais',tag:'Contexto Legal',html:`
+    <div style="font-size:.82rem;color:#334;line-height:1.75;margin-bottom:14px">A Reforma Tributária, regulamentada pela <strong>Lei Complementar nº 214/2025</strong>, representa a mais profunda mudança no sistema de tributação sobre o consumo já implementada no país. Promove a substituição dos atuais tributos — PIS, COFINS, ICMS, ISS e IPI — por um modelo dual: <strong>IBS</strong> (Imposto sobre Bens e Serviços) e <strong>CBS</strong> (Contribuição sobre Bens e Serviços).</div>
+    <div style="display:grid;grid-template-columns:repeat(6,1fr);gap:6px">
+      ${[['2023','✓','EC 132/2023','Reforma Constitucional'],['2025','✓','LC 214/2025','CBS, IBS, IS regulamentados'],['2026','◉','AGORA','CBS 0,9% + IBS 0,1% — ano teste'],['2027','◎','CBS plena','Extinção PIS/COFINS · Split Payment'],['2029–32','◎','IBS gradual','Substituição ICMS/ISS'],['2033','★','Vigência integral','Extinção ICMS, ISS e IPI']].map(([yr,ico,tit,desc],i)=>'<div style="background:'+(i===2?'#fffbf0':'#f8f9ff')+';border:1px solid '+(i===2?'#ffcc44':'#dde2f0')+';border-radius:7px;padding:10px 8px;text-align:center"><div style="font-size:1rem;margin-bottom:4px">'+ico+'</div><div style="font-family:\'DM Mono\',monospace;font-weight:700;font-size:.65rem;color:'+(i===2?'#aa7700':'#1a2340')+'">'+yr+'</div><div style="font-size:.68rem;font-weight:700;color:#1a2340;margin:2px 0">'+tit+'</div><div style="font-size:.62rem;color:#6677aa;line-height:1.4">'+desc+'</div></div>').join('')}
+    </div>`
+  },
+  {id:'s03',icon:'⚙️',title:'3. Critérios e Parâmetros',tag:'Premissas',html:`
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px">
+      <div>
+        <div style="font-size:.75rem;font-weight:700;color:#1a2340;margin-bottom:10px;border-bottom:2px solid #C9A84C;padding-bottom:5px">Alíquotas Utilizadas</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:14px">
+          <div style="background:#f0f7ff;border:1px solid #bcd5f5;border-radius:6px;padding:10px;text-align:center"><div style="font-size:.6rem;color:#224488;font-family:'DM Mono',monospace">CBS</div><div style="font-family:'Syne',sans-serif;font-weight:800;font-size:1.2rem;color:#1155bb">3,52%</div></div>
+          <div style="background:#f0fff6;border:1px solid #bde8cc;border-radius:6px;padding:10px;text-align:center"><div style="font-size:.6rem;color:#226633;font-family:'DM Mono',monospace">IBS</div><div style="font-family:'Syne',sans-serif;font-weight:800;font-size:1.2rem;color:#008833">7,08%</div></div>
+          <div style="background:#f8f9ff;border:1px solid #dde2f0;border-radius:6px;padding:10px;text-align:center"><div style="font-size:.6rem;color:#6677aa;font-family:'DM Mono',monospace">IS</div><div style="font-family:'Syne',sans-serif;font-weight:800;font-size:1.2rem;color:#6677aa">0,00%</div></div>
+        </div>
+        <div style="background:#f0fff6;border:1px solid #88ddaa;border-radius:6px;padding:10px;font-size:.78rem;color:#005522"><strong>Redução 60%</strong> aplicada a 100% da receita (Arts.129-142 LC 214/2025)<br>Atividade: Saúde humana — fisioterapia e saúde mental</div>
+      </div>
+      <div>
+        <div style="font-size:.75rem;font-weight:700;color:#1a2340;margin-bottom:10px;border-bottom:2px solid #C9A84C;padding-bottom:5px">Distribuição de Fornecedores</div>
+        <div style="margin-bottom:8px">
+          <div style="display:flex;justify-content:space-between;font-size:.72rem;color:#334;margin-bottom:3px"><span>Regime Normal (PJ)</span><span style="font-weight:700;color:#008833">81,6%</span></div>
+          <div style="height:8px;background:#eef0f8;border-radius:4px;overflow:hidden"><div style="width:81.6%;height:100%;background:linear-gradient(90deg,#44bb88,#22aa66);border-radius:4px"></div></div>
+        </div>
+        <div style="margin-bottom:8px">
+          <div style="display:flex;justify-content:space-between;font-size:.72rem;color:#334;margin-bottom:3px"><span>Simples Nacional</span><span style="font-weight:700;color:#cc4400">20,4%</span></div>
+          <div style="height:8px;background:#eef0f8;border-radius:4px;overflow:hidden"><div style="width:20.4%;height:100%;background:linear-gradient(90deg,#ff9966,#ff6644);border-radius:4px"></div></div>
+        </div>
+        <div style="background:#fff8f0;border:1px solid #ffcc88;border-radius:6px;padding:10px;font-size:.76rem;color:#884400;margin-top:10px">⚠ Fornecedores Simples geram crédito reduzido — perda estimada de <strong>R$ 3.085/mês</strong></div>
+      </div>
+    </div>`
+  },
+  {id:'s04',icon:'📈',title:'4. Resultados da Análise',tag:'Evolução 2026–2033',html:`
+    <div style="font-size:.78rem;color:#334;margin-bottom:14px">Cenário de <strong>redução gradual</strong> da carga tributária total ao longo da transição, com aproveitamento de créditos CBS/IBS na não cumulatividade plena.</div>
+    <div style="font-size:.72rem;font-weight:700;color:#1a2340;margin-bottom:8px;font-family:'DM Mono',monospace;text-transform:uppercase;letter-spacing:.06em">Resultado Total CBS+IBS+Legados (R$/mês)</div>
+    <div style="display:flex;gap:4px;align-items:flex-end;height:100px;margin-bottom:6px">
+      ${[['2026',48600,'#ff6644',true],['2027',40496,'#7b61ff',false],['2028',44222,'#7b61ff',false],['2029',45225,'#7b61ff',false],['2030',46378,'#7b61ff',false],['2031',44807,'#7b61ff',false],['2032',44279,'#7b61ff',false],['2033',34940,'#22aa66',false]].map(([yr,val,col,is26])=>{const h=Math.round((val/48600)*88);return'<div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:3px"><div style="font-size:.58rem;font-family:\'DM Mono\',monospace;color:#334;font-weight:700">'+Math.round(val/1000)+'k</div><div style="width:100%;height:'+h+'px;background:'+col+';border-radius:3px 3px 0 0;opacity:'+(is26?'1':'.75')+'"></div><div style="font-size:.58rem;color:#6677aa;text-align:center">'+yr+'</div></div>';}).join('')}
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:8px">
+      <div style="background:#fff0f0;border:1px solid #ffcccc;border-radius:6px;padding:10px;font-size:.76rem;color:#334"><strong style="color:#cc2200">2026–2028:</strong> Tributos atuais + CBS/IBS progressivos coexistem. Pico em 2026 com regime duplo.</div>
+      <div style="background:#f0fff6;border:1px solid #bde8cc;border-radius:6px;padding:10px;font-size:.76rem;color:#334"><strong style="color:#008833">2033:</strong> Queda para R$ 34.939/mês — extinção ICMS/ISS e aproveitamento pleno de créditos.</div>
+    </div>`
+  },
+  {id:'s05',icon:'📋',title:'5. Decisor IBS/CBS',tag:'Evolução por ano',html:`
+    <div style="overflow-x:auto">
+    <table style="width:100%;border-collapse:collapse;font-size:.72rem">
+      <thead><tr style="background:#0d1117;color:#E8C96A">
+        ${['Ano','Faturamento','CBS Bruto','IBS Bruto','Créd. CBS','Créd. IBS','CBS+IBS Líq.','Alíq. Efet.'].map(h=>'<th style="padding:8px 10px;text-align:right;font-family:\'DM Mono\',monospace;font-size:.62rem;font-weight:700;letter-spacing:.06em;white-space:nowrap">'+h+'</th>').join('')}
+      </tr></thead>
+      <tbody>
+        ${[['2025','544.618','0','0','0','0','0','0,00%'],['2026','544.618','1.960','217','619','68','1.490','0,27%'],['2027','544.618','19.170','217','6.054','68','13.265','2,44%'],['2028','544.618','19.170','5.664','6.054','1.788','16.991','3,12%'],['2029','544.618','19.170','11.110','6.054','3.508','20.717','3,80%'],['2030','544.618','19.170','16.774','6.054','5.297','24.592','4,52%'],['2031','544.618','19.170','22.438','6.054','7.086','28.468','5,23%'],['2032','544.618','19.170','29.627','6.054','9.356','33.386','6,13%'],['2033','544.618','19.170','38.558','7.568','15.222','34.939','6,42%']].map((row,i)=>'<tr style="background:'+(i===0?'#f8f9ff':i%2===0?'#fff':'#f8f9ff')+'">' + row.map((cell,j)=>'<td style="padding:7px 10px;border-bottom:1px solid #eef0f8;text-align:right;color:'+(j===6?'#008833':j===7?'#1155bb':'#1a2340')+';font-weight:'+(j>=6?'700':'400')+'">'+cell+'</td>').join('') + '</tr>').join('')}
+        <tr style="background:#0d1117"><td colspan="7" style="padding:8px 10px;color:#C9A84C;font-family:'DM Mono',monospace;font-size:.68rem;font-weight:700">TOTAIS 2025–2033</td><td style="padding:8px 10px;text-align:right;color:#E8C96A;font-family:'Syne',sans-serif;font-weight:800;font-size:.85rem">3,55%</td></tr>
+      </tbody>
+    </table></div>`
+  },
+  {id:'s06',icon:'⚖️',title:'6. Score + Comparativo de Regimes',tag:'Melhor regime 2033',html:`
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px">
+      <div>
+        <div style="background:#f8f9ff;border:1px solid #dde2f0;border-radius:8px;padding:14px;margin-bottom:12px">
+          <div style="display:flex;align-items:center;gap:14px">
+            <div style="width:64px;height:64px;border-radius:50%;border:3px solid #00bb77;background:#f0fff6;display:flex;flex-direction:column;align-items:center;justify-content:center;flex-shrink:0"><div style="font-family:'Syne',sans-serif;font-weight:900;font-size:1.4rem;color:#00aa66;line-height:1">10</div><div style="font-size:.55rem;color:#00aa66;font-weight:700">BAIXO</div></div>
+            <div style="font-size:.78rem;color:#334;line-height:1.6">Score de Risco <strong>10/100</strong>. Carga atual: <strong>R$ 47.109/mês</strong>. Em 2033: <strong style="color:#008833">R$ 34.939/mês</strong> (6,42% após créditos).</div>
+          </div>
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+          ${[['Faturamento Mensal','R$ 544.618','#1a2340'],['Carga Atual','R$ 47.109','#cc2200'],['CBS+IBS 2033','R$ 34.939','#008833'],['Crédito CBS/IBS Mensal','R$ 22.790','#1155bb']].map(([lbl,val,col])=>'<div style="background:#f8f9ff;border:1px solid #dde2f0;border-radius:6px;padding:10px"><div style="font-size:.6rem;color:#6677aa;font-family:\'DM Mono\',monospace;text-transform:uppercase;margin-bottom:3px">'+lbl+'</div><div style="font-family:\'Syne\',sans-serif;font-weight:800;font-size:.95rem;color:'+col+'">'+val+'</div></div>').join('')}
+        </div>
+      </div>
+      <div>
+        <div style="font-size:.72rem;font-weight:700;color:#1a2340;margin-bottom:10px;font-family:'DM Mono',monospace;text-transform:uppercase;letter-spacing:.06em">Comparativo de Regimes 2033</div>
+        <div style="background:linear-gradient(135deg,#f0fff6,#e8f8ef);border:2px solid #00bb77;border-radius:10px;padding:14px;text-align:center;margin-bottom:8px">
+          <div style="display:inline-block;background:#00aa66;color:#fff;font-size:.6rem;font-family:'DM Mono',monospace;font-weight:700;padding:2px 10px;border-radius:10px;margin-bottom:6px">🏆 MELHOR OPÇÃO</div>
+          <div style="font-family:'Syne',sans-serif;font-weight:800;font-size:.95rem;color:#0d1117">Lucro Presumido</div>
+          <div style="font-family:'Syne',sans-serif;font-weight:900;font-size:1.6rem;color:#008833">R$ 92.193</div>
+          <div style="font-size:.68rem;color:#226633">16,93% da receita/mês</div>
+        </div>
+        <div style="background:#f8f9ff;border:1px solid #dde2f0;border-radius:8px;padding:12px;text-align:center">
+          <div style="font-size:.72rem;color:#6677aa;margin-bottom:4px">Lucro Real</div>
+          <div style="font-family:'Syne',sans-serif;font-weight:800;font-size:1.2rem;color:#cc2200">R$ 167.109</div>
+          <div style="font-size:.68rem;color:#6677aa">30,68% da receita/mês</div>
+        </div>
+        <div style="margin-top:8px;background:#fff8f0;border:1px solid #ffcc88;border-radius:6px;padding:10px;font-size:.74rem;color:#884400">💡 <strong>Boas notícias:</strong> Seu regime atual (Lucro Presumido) já é a melhor opção para 2033. Mantenha e monitore anualmente.</div>
+      </div>
+    </div>`
+  },
+  {id:'s07',icon:'💰',title:'7. Formação de Preço',tag:'16 produtos/serviços',html:`
+    <div style="background:#fff8f0;border:1px solid #ffcc88;border-radius:6px;padding:10px;margin-bottom:12px;font-size:.76rem;color:#884400">⚠ Margem de 30% aplicada a 16 itens. Preço base total: <strong>R$ 16.110</strong> → Preço sugerido RT: <strong>R$ 23.162</strong> (+43,8%). Redução 60% Art.130 aplicada a 100% da receita.</div>
+    <div style="overflow-x:auto">
+    <table style="width:100%;border-collapse:collapse;font-size:.7rem">
+      <thead><tr style="background:#0d1117;color:#E8C96A">
+        ${['#','Serviço','Preço Atual','Preço Sugerido RT','Variação','CBS%','IBS%','Margem Líq.'].map(h=>'<th style="padding:6px 8px;text-align:left;font-family:\'DM Mono\',monospace;font-size:.6rem;white-space:nowrap">'+h+'</th>').join('')}
+      </tr></thead>
+      <tbody>
+        ${[['1','Fisioterapia Ortopédica','R$ 130','R$ 186,91','+R$ 56,91','3,52%','7,08%','R$ 39'],['2','Fisioterapia Domiciliar','R$ 180','R$ 258,80','+R$ 78,80','3,52%','7,08%','R$ 54'],['3','Ginástica Laboral','R$ 220','R$ 316,32','+R$ 96,32','3,52%','7,08%','R$ 66'],['4','Ergonomia Corporativa','R$ 1.800','R$ 2.588,04','+R$ 788,04','3,52%','7,08%','R$ 540'],['5','Sessão Psicoterapia Individual','R$ 150','R$ 215,67','+R$ 65,67','3,52%','7,08%','R$ 45'],['6','Psicometria','R$ 270','R$ 388,21','+R$ 118,21','3,52%','7,08%','R$ 81'],['7','Psicoterapia Empresarial','R$ 660','R$ 948,95','+R$ 288,95','3,52%','7,08%','R$ 198'],['8','Psicologia Infantil','R$ 180','R$ 258,80','+R$ 78,80','3,52%','7,08%','R$ 54'],['9','Prog. Saúde Mental Corp.','R$ 3.200','R$ 4.600,96','+R$1.400,96','3,52%','7,08%','R$ 960'],['10','Avaliação Psicológica','R$ 80','R$ 115,02','+R$ 35,02','3,52%','7,08%','R$ 24'],['11','Terapia Fala Infantil','R$ 120','R$ 172,54','+R$ 52,54','3,52%','7,08%','R$ 36'],['12','Reabilitação Vocal','R$ 140','R$ 201,29','+R$ 61,29','3,52%','7,08%','R$ 42'],['13','Treinamento Comunicação Emp.','R$ 5.200','R$ 7.476,56','+R$2.276,56','3,52%','7,08%','R$1.560'],['14','Consultoria Vocal Profissionais','R$ 3.300','R$ 4.744,74','+R$1.444,74','3,52%','7,08%','R$ 990'],['15','Terapia Ocupacional Infantil','R$ 80','R$ 115,02','+R$ 35,02','3,52%','7,08%','R$ 24'],['16','Integração Sensorial','R$ 400','R$ 575,12','+R$ 175,12','3,52%','7,08%','R$ 120']].map((row,i)=>'<tr style="background:'+(i%2===0?'#fff':'#f8f9ff')+'">' + row.map((cell,j)=>'<td style="padding:5px 8px;border-bottom:1px solid #eef0f8;color:'+(j===3?'#1155bb':j===4?'#008833':j===7?'#C9A84C':'#1a2340')+';font-weight:'+(j>=3?'600':'400')+';white-space:nowrap">'+cell+'</td>').join('') + '</tr>').join('')}
+        <tr style="background:#f0f2f8;font-weight:700"><td colspan="2" style="padding:7px 8px;color:#1a2340;font-family:'DM Mono',monospace;font-size:.65rem">TOTAL (16 itens)</td><td style="padding:7px 8px;color:#1a2340">R$ 16.110</td><td style="padding:7px 8px;color:#1155bb">R$ 23.162</td><td style="padding:7px 8px;color:#008833">+R$ 7.052</td><td colspan="2"></td><td style="padding:7px 8px;color:#C9A84C">R$ 4.833</td></tr>
+      </tbody>
+    </table></div>`
+  },
+  {id:'s08',icon:'🏷️',title:'8. ClassTrib RT — NCM/NBS',tag:'Classificação fiscal',html:`
+    <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:14px">
+      ${[['BENEFICIADOS','2 de 2','#008833','#f0fff6','#bde8cc'],['RED. 60%','2 itens','#1155bb','#f0f7ff','#bcd5f5'],['RED. 30%','0 itens','#6677aa','#f8f9ff','#dde2f0'],['IS (SELETIVO)','Nenhum','#6677aa','#f8f9ff','#dde2f0']].map(([lbl,val,col,bg,border])=>'<div style="background:'+bg+';border:1px solid '+border+';border-radius:8px;padding:12px;text-align:center"><div style="font-size:.6rem;color:'+col+';font-family:\'DM Mono\',monospace;text-transform:uppercase;margin-bottom:4px">'+lbl+'</div><div style="font-family:\'Syne\',sans-serif;font-weight:800;font-size:1.4rem;color:'+col+'">'+val+'</div></div>').join('')}
+    </div>
+    <div style="background:#f0fff6;border:1px solid #88ddaa;border-radius:6px;padding:10px;font-size:.76rem;color:#005522;margin-bottom:12px">✅ <strong>2 de 2 itens (100%)</strong> possuem benefício fiscal na reforma — Redução 60% (Arts.129-142 LC 214/2025).</div>
+    <table style="width:100%;border-collapse:collapse;font-size:.72rem">
+      <thead><tr style="background:#0d1117;color:#E8C96A">${['Produto/Serviço','Código','Tipo','Regime RT','ClassTrib','CBS%','IBS%','Total RT'].map(h=>'<th style="padding:7px 10px;text-align:left;font-family:\'DM Mono\',monospace;font-size:.6rem">'+h+'</th>').join('')}</tr></thead>
+      <tbody>
+        <tr style="background:#fff"><td style="padding:7px 10px;border-bottom:1px solid #eef0f8;color:#1a2340">Serviços de enfermagem, fisioterapia e reabilitação</td><td style="padding:7px 10px;border-bottom:1px solid #eef0f8;font-family:'DM Mono',monospace;color:#6677aa">4.03.01.00</td><td style="padding:7px 10px;border-bottom:1px solid #eef0f8"><span style="background:#f0f7ff;border:1px solid #bcd5f5;border-radius:4px;padding:1px 7px;font-size:.62rem;color:#1155bb;font-weight:700">NBS</span></td><td style="padding:7px 10px;border-bottom:1px solid #eef0f8"><span style="background:#f0fff6;border:1px solid #88ddaa;border-radius:4px;padding:1px 7px;font-size:.62rem;color:#008833;font-weight:700">Red. 60% — Arts.129-142</span></td><td style="padding:7px 10px;border-bottom:1px solid #eef0f8;font-family:'DM Mono',monospace;font-size:.65rem">200/200029</td><td style="padding:7px 10px;border-bottom:1px solid #eef0f8;color:#1155bb;font-weight:700">3,52%</td><td style="padding:7px 10px;border-bottom:1px solid #eef0f8;color:#008833;font-weight:700">7,08%</td><td style="padding:7px 10px;border-bottom:1px solid #eef0f8;color:#C9A84C;font-weight:700">10,60%</td></tr>
+        <tr style="background:#f8f9ff"><td style="padding:7px 10px;color:#1a2340">Serviços de saúde mental PJ — clínicas e centros</td><td style="padding:7px 10px;font-family:'DM Mono',monospace;color:#6677aa">4.05.01.00</td><td style="padding:7px 10px"><span style="background:#f0f7ff;border:1px solid #bcd5f5;border-radius:4px;padding:1px 7px;font-size:.62rem;color:#1155bb;font-weight:700">NBS</span></td><td style="padding:7px 10px"><span style="background:#f0fff6;border:1px solid #88ddaa;border-radius:4px;padding:1px 7px;font-size:.62rem;color:#008833;font-weight:700">Red. 60% — Arts.129-142</span></td><td style="padding:7px 10px;font-family:'DM Mono',monospace;font-size:.65rem">200/200029</td><td style="padding:7px 10px;color:#1155bb;font-weight:700">3,52%</td><td style="padding:7px 10px;color:#008833;font-weight:700">7,08%</td><td style="padding:7px 10px;color:#C9A84C;font-weight:700">10,60%</td></tr>
+      </tbody>
+    </table>`
+  },
+  {id:'s09',icon:'💸',title:'9. Split Payment — Fluxo de Caixa',tag:'Impacto mensal',html:`
+    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;margin-bottom:14px">
+      ${[['Capital de Giro Retido','R$ 43.734/mês','#cc2200','#fff0f0','#ffcccc'],['Fluxo Líquido Após Split','R$ 500.883/mês','#008833','#f0fff6','#bde8cc'],['Impacto em Dias de Prazo','2,4 dias','#1155bb','#f0f7ff','#bcd5f5']].map(([lbl,val,col,bg,border])=>'<div style="background:'+bg+';border:1px solid '+border+';border-radius:8px;padding:14px;text-align:center"><div style="font-size:.62rem;color:'+col+';font-family:\'DM Mono\',monospace;text-transform:uppercase;margin-bottom:5px">'+lbl+'</div><div style="font-family:\'Syne\',sans-serif;font-weight:800;font-size:1.1rem;color:'+col+'">'+val+'</div></div>').join('')}
+    </div>
+    <table style="width:100%;border-collapse:collapse;font-size:.76rem;margin-bottom:12px">
+      <thead><tr style="background:#f0f2f8">${['Meio de Pagamento','% do Total','Valor Retido/Mês'].map(h=>'<th style="padding:7px 10px;text-align:left;color:#6677aa;font-family:\'DM Mono\',monospace;font-size:.62rem;text-transform:uppercase">'+h+'</th>').join('')}</tr></thead>
+      <tbody>
+        ${[['Cartão de Crédito','50,5%','R$ 29.156'],['PIX','25,3%','R$ 14.578'],['Boleto','0,0%','R$ 0'],['Dinheiro','24,2%','R$ 0']].map(([meio,pct,val],i)=>'<tr style="background:'+(i%2===0?'#fff':'#f8f9ff')+'"><td style="padding:7px 10px;border-bottom:1px solid #eef0f8;color:#1a2340">'+meio+'</td><td style="padding:7px 10px;border-bottom:1px solid #eef0f8;font-weight:700;color:#1155bb">'+pct+'</td><td style="padding:7px 10px;border-bottom:1px solid #eef0f8;font-weight:700;color:'+(val==='R$ 0'?'#6677aa':'#cc2200')+'">'+val+'</td></tr>').join('')}
+      </tbody>
+    </table>
+    <div style="background:#fff8f0;border:1px solid #ffcc88;border-radius:6px;padding:10px;font-size:.76rem;color:#884400">⚠ Recomenda-se <strong>reserva de capital de giro</strong> ou linha de crédito para cobrir o impacto nos primeiros dias do mês. O valor acima reflete alíquotas da fase plena 2033 — em 2027 o impacto será menor, crescendo progressivamente.</div>`
+  },
+  {id:'s10',icon:'🏭',title:'10. Análise de Fornecedores',tag:'Alerta de créditos',html:`
+    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;margin-bottom:14px">
+      ${[['Crédito Perdido/Mês','R$ 3.085','#cc2200','#fff0f0','#ffcccc'],['Crédito Perdido/Ano','R$ 37.028','#cc2200','#fff0f0','#ffcccc'],['Economia c/ Migração','R$ 3.085/mês','#008833','#f0fff6','#bde8cc']].map(([lbl,val,col,bg,border])=>'<div style="background:'+bg+';border:1px solid '+border+';border-radius:8px;padding:14px;text-align:center"><div style="font-size:.62rem;color:'+col+';font-family:\'DM Mono\',monospace;text-transform:uppercase;margin-bottom:5px">'+lbl+'</div><div style="font-family:\'Syne\',sans-serif;font-weight:800;font-size:1.1rem;color:'+col+'">'+val+'</div></div>').join('')}
+    </div>
+    <table style="width:100%;border-collapse:collapse;font-size:.76rem;margin-bottom:12px">
+      <thead><tr style="background:#f0f2f8">${['Tipo Fornecedor','% Compras','Crédito Gerado/Mês','Crédito Perdido/Mês'].map(h=>'<th style="padding:7px 10px;text-align:left;color:#6677aa;font-family:\'DM Mono\',monospace;font-size:.62rem">'+h+'</th>').join('')}</tr></thead>
+      <tbody>
+        <tr style="background:#fff"><td style="padding:7px 10px;border-bottom:1px solid #eef0f8;color:#1a2340;font-weight:600">Simples Nacional</td><td style="padding:7px 10px;border-bottom:1px solid #eef0f8;color:#cc4400;font-weight:700">20,4%</td><td style="padding:7px 10px;border-bottom:1px solid #eef0f8;color:#6677aa">—</td><td style="padding:7px 10px;border-bottom:1px solid #eef0f8;color:#cc2200;font-weight:700">R$ 3.526</td></tr>
+        <tr style="background:#f8f9ff"><td style="padding:7px 10px;border-bottom:1px solid #eef0f8;color:#1a2340;font-weight:600">Regime Normal (PJ)</td><td style="padding:7px 10px;border-bottom:1px solid #eef0f8;color:#008833;font-weight:700">81,6%</td><td style="padding:7px 10px;border-bottom:1px solid #eef0f8;color:#008833;font-weight:700">Integral</td><td style="padding:7px 10px;border-bottom:1px solid #eef0f8;color:#6677aa">R$ 0</td></tr>
+        <tr style="background:#fff"><td style="padding:7px 10px;color:#1a2340;font-weight:600">Pessoa Física</td><td style="padding:7px 10px;color:#cc4400;font-weight:700">−2,0%</td><td style="padding:7px 10px;color:#6677aa">R$ 0</td><td style="padding:7px 10px;color:#cc2200;font-weight:700">R$ −440</td></tr>
+      </tbody>
+    </table>
+    <div style="background:#f0fff6;border:1px solid #88ddaa;border-radius:6px;padding:10px;font-size:.76rem;color:#005522">✅ <strong>Risco Baixo</strong> — Perfil de compras saudável. A economia anual potencial com migração para Regime Normal é de <strong>R$ 37.028/ano</strong>. Recomenda-se priorizar a renegociação com os principais fornecedores Simples.</div>`
+  },
+  {id:'s11',icon:'📊',title:'11. Créditos Acumulados CBS/IBS',tag:'Projeção 12 meses',html:`
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px">
+      <div style="background:#f0f7ff;border:1px solid #bcd5f5;border-radius:8px;padding:12px"><div style="font-size:.62rem;color:#224488;font-family:'DM Mono',monospace;text-transform:uppercase;margin-bottom:3px">Crédito Mensal</div><div style="font-family:'Syne',sans-serif;font-weight:800;font-size:1.3rem;color:#1155bb">R$ 22.790</div></div>
+      <div style="background:#f8f9ff;border:1px solid #dde2f0;border-radius:8px;padding:12px"><div style="font-size:.62rem;color:#6677aa;font-family:'DM Mono',monospace;text-transform:uppercase;margin-bottom:3px">Saldo Acumulado</div><div style="font-family:'Syne',sans-serif;font-weight:800;font-size:1.3rem;color:#6677aa">R$ 0</div></div>
+    </div>
+    <div style="overflow-x:auto">
+    <table style="width:100%;border-collapse:collapse;font-size:.72rem">
+      <thead><tr style="background:#0d1117;color:#E8C96A">${['Mês','Débito','Crédito','Saldo Mês','Saldo Acumulado','Status'].map(h=>'<th style="padding:6px 10px;text-align:right;font-family:\'DM Mono\',monospace;font-size:.6rem">'+h+'</th>').join('')}</tr></thead>
+      <tbody>
+        ${Array.from({length:6},(_,i)=>i+1).map((m,i)=>'<tr style="background:'+(i%2===0?'#fff':'#f8f9ff')+'"><td style="padding:5px 10px;border-bottom:1px solid #eef0f8;text-align:right;font-weight:700;color:#1a2340">Mês '+m+'</td><td style="padding:5px 10px;border-bottom:1px solid #eef0f8;text-align:right;color:#cc2200">R$ 57.729</td><td style="padding:5px 10px;border-bottom:1px solid #eef0f8;text-align:right;color:#008833">R$ 22.790</td><td style="padding:5px 10px;border-bottom:1px solid #eef0f8;text-align:right;color:#cc2200;font-weight:700">−R$ 34.939</td><td style="padding:5px 10px;border-bottom:1px solid #eef0f8;text-align:right;color:#cc2200;font-weight:700">−R$ '+(34939*m).toLocaleString('pt-BR')+'</td><td style="padding:5px 10px;border-bottom:1px solid #eef0f8;text-align:right"><span style="background:#fff0f0;border:1px solid #ffcccc;border-radius:4px;padding:1px 7px;font-size:.62rem;color:#cc2200;font-weight:700">A recolher</span></td></tr>').join('')}
+        <tr style="background:#f8f9ff;font-style:italic"><td colspan="6" style="padding:6px 10px;font-size:.68rem;color:#6677aa;text-align:center">... continua por 12 meses no relatório completo</td></tr>
+      </tbody>
+    </table></div>
+    <div style="margin-top:8px;background:#f0f7ff;border:1px solid #bcd5f5;border-radius:6px;padding:10px;font-size:.74rem;color:#224488">📌 <strong>Estratégia recomendada:</strong> Empresa em posição devedora — recolhimento regular do saldo CBS/IBS mensal. Débito supera crédito de entradas — sem saldo credor para ressarcimento no período.</div>`
+  },
+  {id:'s12',icon:'📅',title:'12. Cronograma de Transição',tag:'2026–2033 personalizado',html:`
+    <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:14px">
+      ${[['2026','CBS 0,36%+IBS 0,04%','0,4%','Monitorar CGIBS','#e8f0ff','#bcd5f5','#1155bb'],['2027','CBS 3,52%+IBS 0,04%','3,6%','Revisar capital de giro Split','#fff8f0','#ffcc88','#aa7700'],['2028','CBS 3,52%+IBS 1,04%','4,6%','Monitorar CGIBS','#f0f7ff','#bcd5f5','#1155bb'],['2029','CBS 3,52%+IBS 2,04%','5,6%','ICMS/ISS reduzem 10%','#fff0f0','#ffcccc','#cc2200'],['2030','CBS 3,52%+IBS 3,08%','6,6%','IBS+ICMS/ISS transição','#f0f7ff','#bcd5f5','#1155bb'],['2031','CBS 3,52%+IBS 4,12%','7,6%','IVA Dual dominante','#fff0f0','#ffcccc','#cc2200'],['2032','CBS 3,52%+IBS 5,44%','9,0%','Revisão regime obrigatória','#fff0f0','#ffcccc','#cc2200'],['2033','CBS 3,52%+IBS 7,08%','10,6%','Regime pleno — extinção total','#f0fff6','#bde8cc','#008833']].slice(0,4).map(([yr,aliq,total,acao,bg,bord,col])=>'<div style="background:'+bg+';border:1px solid '+bord+';border-radius:8px;padding:12px;text-align:center"><div style="font-family:\'Syne\',sans-serif;font-weight:900;font-size:1.1rem;color:'+col+'">'+yr+'</div><div style="font-size:.62rem;color:'+col+';font-family:\'DM Mono\',monospace;margin:4px 0">'+aliq+'</div><div style="font-family:\'Syne\',sans-serif;font-weight:800;font-size:1.4rem;color:'+col+'">'+total+'</div><div style="font-size:.65rem;color:#6677aa;margin-top:4px;line-height:1.4">'+acao+'</div></div>').join('')}
+    </div>
+    <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px">
+      ${[['2026','CBS 0,36%+IBS 0,04%','0,4%','Monitorar CGIBS','#e8f0ff','#bcd5f5','#1155bb'],['2027','CBS 3,52%+IBS 0,04%','3,6%','Revisar capital de giro Split','#fff8f0','#ffcc88','#aa7700'],['2028','CBS 3,52%+IBS 1,04%','4,6%','Monitorar CGIBS','#f0f7ff','#bcd5f5','#1155bb'],['2029','CBS 3,52%+IBS 2,04%','5,6%','ICMS/ISS reduzem 10%','#fff0f0','#ffcccc','#cc2200'],['2030','CBS 3,52%+IBS 3,08%','6,6%','IBS+ICMS/ISS transição','#f0f7ff','#bcd5f5','#1155bb'],['2031','CBS 3,52%+IBS 4,12%','7,6%','IVA Dual dominante','#fff0f0','#ffcccc','#cc2200'],['2032','CBS 3,52%+IBS 5,44%','9,0%','Revisão regime obrigatória','#fff0f0','#ffcccc','#cc2200'],['2033','CBS 3,52%+IBS 7,08%','10,6%','Regime pleno — extinção total','#f0fff6','#bde8cc','#008833']].slice(4).map(([yr,aliq,total,acao,bg,bord,col])=>'<div style="background:'+bg+';border:1px solid '+bord+';border-radius:8px;padding:12px;text-align:center"><div style="font-family:\'Syne\',sans-serif;font-weight:900;font-size:1.1rem;color:'+col+'">'+yr+'</div><div style="font-size:.62rem;color:'+col+';font-family:\'DM Mono\',monospace;margin:4px 0">'+aliq+'</div><div style="font-family:\'Syne\',sans-serif;font-weight:800;font-size:1.4rem;color:'+col+'">'+total+'</div><div style="font-size:.65rem;color:#6677aa;margin-top:4px;line-height:1.4">'+acao+'</div></div>').join('')}
+    </div>`
+  },
+  {id:'s13',icon:'⚠️',title:'13. Pontos de Atenção',tag:'1 alerta identificado',html:`
+    <div style="background:#fff8f0;border:1px solid #ffcc88;border-radius:8px;padding:16px;margin-bottom:14px">
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px">
+        <span style="font-size:1.3rem">🏥</span>
+        <div style="font-family:'Syne',sans-serif;font-weight:700;font-size:.88rem;color:#1a2340">Convênios de Saúde — Regime de Apuração Especial</div>
+      </div>
+      <div style="font-size:.8rem;color:#334;line-height:1.7">Com <strong>60% da receita de convênios/planos de saúde</strong>, a empresa precisa avaliar o impacto da <strong>redução de 60% (Art. 130 LC 214/2025)</strong> sobre essa parcela da receita e como separar a apuração entre receitas de convênio e particulares a partir de 2027.</div>
+      <div style="margin-top:10px;background:#fff;border:1px solid #eee;border-radius:6px;padding:10px;font-size:.75rem;color:#334">
+        📋 <strong>Serviço recomendado:</strong> Segregação de receitas convênio vs. particular — apuração CBS/IBS separada por tipo de receita.
+      </div>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px">
+      <div style="background:#f0fff6;border:1px solid #bde8cc;border-radius:8px;padding:12px">
+        <div style="font-size:.65rem;color:#226633;font-family:'DM Mono',monospace;text-transform:uppercase;margin-bottom:4px">Receita Convênio</div>
+        <div style="font-family:'Syne',sans-serif;font-weight:800;font-size:1.1rem;color:#008833">~60%</div>
+        <div style="font-size:.7rem;color:#226633;margin-top:3px">Red. 60% Art.130 aplicável</div>
+      </div>
+      <div style="background:#f0f7ff;border:1px solid #bcd5f5;border-radius:8px;padding:12px">
+        <div style="font-size:.65rem;color:#224488;font-family:'DM Mono',monospace;text-transform:uppercase;margin-bottom:4px">Receita Particular</div>
+        <div style="font-family:'Syne',sans-serif;font-weight:800;font-size:1.1rem;color:#1155bb">~40%</div>
+        <div style="font-size:.7rem;color:#224488;margin-top:3px">Apuração separada recomendada</div>
+      </div>
+      <div style="background:#fff0f0;border:1px solid #ffcccc;border-radius:8px;padding:12px">
+        <div style="font-size:.65rem;color:#cc2200;font-family:'DM Mono',monospace;text-transform:uppercase;margin-bottom:4px">Risco sem segregação</div>
+        <div style="font-family:'Syne',sans-serif;font-weight:800;font-size:1.1rem;color:#cc2200">Glosa</div>
+        <div style="font-size:.7rem;color:#cc2200;margin-top:3px">Perda de benefício em fiscalização</div>
+      </div>
+    </div>`
+  },
+  {id:'s14',icon:'📅',title:'14. Calendário Personalizado',tag:'Valores reais da empresa',html:`
+    <div style="display:flex;flex-direction:column;gap:6px">
+      ${[['2026','Fase teste — CBS 0,36%+IBS 0,04% · Tributos atuais mantidos','R$ 48.600/mês','R$ 1.490/mês','#e8f0ff','#bcd5f5','#1155bb',''],['2027','▼ 16,7% vs 2026 · CBS plena 3,52% · PIS/COFINS extintos · Split Payment inicia','R$ 40.496/mês','R$ 13.265/mês','#fff8f0','#ffcc88','#aa7700','⚠'],['2028','▲ 9,2% vs 2027 · IBS 1,04% · ICMS/ISS mantidos · EFD-CBS obrigatória','R$ 44.222/mês','R$ 16.991/mês','#f0f7ff','#bcd5f5','#1155bb',''],['2029','▲ 2,3% vs 2028 · IBS 2,04% · ICMS/ISS reduzem 10%','R$ 45.225/mês','R$ 20.717/mês','#fff0f0','#ffcccc','#cc2200','⚠'],['2030','▲ 2,5% vs 2029 · IBS 3,08% · ICMS/ISS reduzem mais 20%','R$ 46.377/mês','R$ 24.592/mês','#f0f7ff','#bcd5f5','#1155bb',''],['2031','▼ 3,4% vs 2030 · IBS 4,12% · IVA Dual dominante','R$ 44.806/mês','R$ 28.468/mês','#f0f7ff','#bcd5f5','#1155bb',''],['2032','▼ 1,2% vs 2031 · IBS 5,44% · ICMS/ISS quase extintos','R$ 44.278/mês','R$ 33.386/mês','#fff0f0','#ffcccc','#cc2200',''],['2033','▼ 21,1% vs 2032 · IVA Dual pleno · ICMS/ISS e IPI extintos','R$ 34.939/mês','R$ 34.939/mês','#f0fff6','#bde8cc','#008833','⭐']].map(([yr,desc,total,cbsibs,bg,bord,col,ico])=>'<div style="background:'+bg+';border:1px solid '+bord+';border-radius:8px;padding:10px 14px;display:grid;grid-template-columns:60px 1fr auto auto;gap:12px;align-items:center"><div style="font-family:\'Syne\',sans-serif;font-weight:900;font-size:1rem;color:'+col+'">'+ico+' '+yr+'</div><div style="font-size:.72rem;color:#334;line-height:1.4">'+desc+'</div><div style="text-align:right"><div style="font-size:.6rem;color:#6677aa;font-family:\'DM Mono\',monospace">TOTAL</div><div style="font-family:\'Syne\',sans-serif;font-weight:800;font-size:.85rem;color:'+col+'">'+total+'</div></div><div style="text-align:right"><div style="font-size:.6rem;color:#6677aa;font-family:\'DM Mono\',monospace">CBS+IBS</div><div style="font-family:\'Syne\',sans-serif;font-weight:700;font-size:.82rem;color:#1155bb">'+cbsibs+'</div></div></div>').join('')}
+    </div>`
+  },
+  {id:'s15',icon:'🎯',title:'15–17. Plano de Ação',tag:'11 iniciativas prioritárias',html:`
+    <div style="display:flex;flex-direction:column;gap:8px">
+      ${[['🔴','Imediato','Revisar precificação dos 16 serviços incorporando CBS 3,52%+IBS 7,08%. Carga efetiva: 10,60%.','LC 214/2025, Art.12 §2º I'],['🔴','Até Jan/2027','Split Payment reterá R$ 43.734/mês. Dimensionar linha de crédito mínima de R$ 43.734.','LC 214/2025, Arts.31-35'],['🟡','Monitorar','Já no melhor regime (Lucro Presumido). Revisão anual obrigatória.','Análise preditiva RT 360'],['🟡','60 dias','Revisar contratos com cláusula RT para anos-chave: 2027, 2029, 2031, 2033.','EC 132/2023 + REsp 1.111.234/PR'],['🟢','6 meses','Adequar ERP: CBS/IBS por NCM/NBS, destacar nas NFs, adaptar para nova EFD-CBS.','LC 214/2025 — Obrig. Acessórias'],['🔴','2026–2027','Mapear e maximizar créditos CBS/IBS sobre insumos — R$ 52.378/mês elegíveis (R$ 5.552/mês crédito).','TaxPlanningAI — LC 214/2025'],['🔴','2026–2027','Migrar fornecedores Simples (20,4%) → recuperar R$ 3.086/mês em créditos adicionais.','TaxPlanningAI — LC 214/2025'],['🔴','2026–2027','Estruturar reserva de capital de giro de R$ 87.468 (2 meses) para Split Payment.','TaxPlanningAI — LC 214/2025'],['🔴','2026–2027','Formalizar documentação probatória que 100% da receita está nos CNAEs beneficiados.','TaxPlanningAI — LC 214/2025'],['🔴','2026–2027','Segregar receitas mistas: serviços de saúde (10,6%) vs produtos (26,5%).','TaxPlanningAI — LC 214/2025'],['🔴','Jan/2027','CBS passa a 3,52%: R$ 6.612 a menos/mês. Revisar DRE e fluxo de caixa projetado.','Calendário RT — LC 214/2025']].map(([sinal,prazo,acao,base],i)=>'<div style="background:'+(sinal==='🔴'?'#fff8f8':sinal==='🟡'?'#fffbf0':'#f8fff8')+';border:1px solid '+(sinal==='🔴'?'#ffcccc':sinal==='🟡'?'#ffe099':'#bde8cc')+';border-radius:7px;padding:10px 14px;display:grid;grid-template-columns:24px 90px 1fr;gap:10px;align-items:start"><div style="font-size:1rem;margin-top:1px">'+sinal+'</div><div><div style="font-family:\'DM Mono\',monospace;font-size:.62rem;font-weight:700;color:'+(sinal==='🔴'?'#cc2200':sinal==='🟡'?'#aa7700':'#008833')+'">'+prazo+'</div><div style="font-size:.62rem;color:#6677aa;margin-top:2px">'+base+'</div></div><div style="font-size:.76rem;color:#334;line-height:1.5">'+(i+1)+'. '+acao+'</div></div>').join('')}
+    </div>`
+  },
+  {id:'s16',icon:'🧠',title:'18–20. TaxPlanningAI',tag:'6 recomendações — Alta prioridade',html:`
+    <div style="display:flex;flex-direction:column;gap:10px">
+      ${[['Mapeamento de Créditos IBS/CBS sobre Insumos','Economia potencial de até R$ 5.552/mês em créditos — reduz carga efetiva abaixo de 9,0% sobre receita a partir de 2027.','Alta'],['Migração Estratégica de Fornecedores Simples','Recuperação de R$ 3.086/mês (R$ 37.032/ano) em créditos adicionais IBS/CBS migrando 20,4% de compras.','Alta'],['Adequação ao Split Payment e Capital de Giro','Prevenção de impacto de R$ 43.734/mês — reserva mínima de R$ 87.468 (2 meses) + linha de crédito rotativo.','Alta'],['Confirmação da Alíquota Reduzida 60% para Saúde','Manutenção de benefício equivalente a R$ 86.553/mês vs. alíquota plena. Documentação probatória obrigatória.','Alta'],['Revisão de Receitas Mistas — Segregação por CNAE','Risco de até R$ 86.553/mês caso receitas sejam reclassificadas. Economia de até R$ 15.000/mês com segregação correta.','Alta'],['Planejamento 2026-2033 — Revisão Regime Lucro Real','Potencial redução de R$ 3.168 a R$ 8.718/mês entre 2029-2033 mediante mudança de regime no momento adequado.','Média']].map(([titulo,impacto,prior])=>'<div style="background:#f8f9ff;border:1px solid #dde2f0;border-radius:8px;padding:12px"><div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:6px"><div style="font-family:\'Syne\',sans-serif;font-weight:700;font-size:.82rem;color:#1a2340">'+titulo+'</div><span style="flex-shrink:0;margin-left:10px;background:'+(prior==='Alta'?'#fff0f0':'#fff8f0')+';border:1px solid '+(prior==='Alta'?'#ffcccc':'#ffcc88')+';color:'+(prior==='Alta'?'#cc2200':'#aa7700')+';font-size:.6rem;font-family:\'DM Mono\',monospace;font-weight:700;padding:2px 8px;border-radius:10px;white-space:nowrap">'+prior+'</span></div><div style="font-size:.75rem;color:#556;line-height:1.5">'+impacto+'</div></div>').join('')}
+    </div>`
+  },
+  {id:'s17',icon:'🤝',title:'21. Reunião de Apresentação',tag:'Inclusa no pacote',html:`
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px">
+      <div>
+        <div style="background:linear-gradient(135deg,#f0fff6,#e8f8ef);border:2px solid #00bb77;border-radius:10px;padding:16px;margin-bottom:12px">
+          <div style="font-family:'Syne',sans-serif;font-weight:800;font-size:.92rem;color:#0d1117;margin-bottom:8px">✅ Incluso no diagnóstico RT 360°</div>
+          <div style="display:flex;flex-direction:column;gap:6px">
+            ${['Apresentação executiva do relatório com o cliente','Explicação de cada seção em linguagem de negócios','Destaque das 3 ações prioritárias e prazos','Resposta a dúvidas técnicas e estratégicas','Orientação sobre próximos passos','Entrega do PDF completo em alta resolução'].map(item=>'<div style="display:flex;gap:8px;font-size:.78rem;color:#334"><span style="color:#008833;font-weight:700;flex-shrink:0">✓</span><span>'+item+'</span></div>').join('')}
+          </div>
+        </div>
+        <div style="background:#f8f9ff;border:1px solid #dde2f0;border-radius:8px;padding:12px">
+          <div style="font-size:.72rem;color:#6677aa;font-family:'DM Mono',monospace;text-transform:uppercase;margin-bottom:6px">Formato da reunião</div>
+          <div style="font-size:.8rem;color:#334;line-height:1.7">📍 Presencial ou online<br>⏱ 30 a 60 minutos<br>👥 Contador + Gestor/Sócios<br>📊 Projeção do relatório + slides executivos</div>
+        </div>
+      </div>
+      <div>
+        <div style="font-size:.75rem;font-weight:700;color:#1a2340;margin-bottom:10px;border-bottom:2px solid #C9A84C;padding-bottom:5px">O que o cliente recebe ao final</div>
+        <div style="display:flex;flex-direction:column;gap:7px">
+          ${[['📑','Relatório PDF completo','21 seções · análise técnica e executiva'],['🎯','Plano de ação priorizado','11 iniciativas com prazos e responsáveis'],['📅','Calendário personalizado','Valores reais 2026–2033 por ano'],['🧠','Recomendações TaxPlanningAI','6 recomendações de Alta prioridade'],['⚠️','Alertas específicos','Pontos de risco do seu perfil'],['📋','Checklist de preparação','Para os marcos críticos da reforma']].map(([ico,tit,desc])=>'<div style="background:#f8f9ff;border:1px solid #dde2f0;border-radius:7px;padding:10px 12px;display:flex;gap:10px;align-items:flex-start"><span style="font-size:1.1rem;flex-shrink:0">'+ico+'</span><div><div style="font-family:\'Syne\',sans-serif;font-weight:700;font-size:.78rem;color:#1a2340">'+tit+'</div><div style="font-size:.68rem;color:#6677aa;margin-top:2px">'+desc+'</div></div></div>').join('')}
+        </div>
+      </div>
+    </div>`
+  }
+];
+
+function buildRptMenu(){
+  const menu=document.getElementById('rpt-menu');
+  if(!menu)return;
+  RPT_SECTIONS.forEach((sec,i)=>{
+    const btn=document.createElement('button');
+    btn.style.cssText='width:100%;text-align:left;background:none;border:none;border-radius:6px;padding:7px 10px;cursor:pointer;display:flex;align-items:center;gap:8px;transition:background .15s;font-family:inherit';
+    btn.innerHTML='<span style="font-size:.9rem;flex-shrink:0">'+sec.icon+'</span><div style="min-width:0"><div style="font-size:.72rem;font-weight:700;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">'+sec.title.replace(/^\d+\. /,'')+'</div><div style="font-size:.6rem;color:var(--text3)">'+sec.tag+'</div></div>';
+    btn.onmouseenter=()=>{if(!btn.classList.contains('active'))btn.style.background='rgba(255,255,255,.04)'};
+    btn.onmouseleave=()=>{if(!btn.classList.contains('active'))btn.style.background='none'};
+    btn.onclick=()=>showRptSection(i);
+    btn.id='rpt-btn-'+i;
+    menu.appendChild(btn);
+  });
+  showRptSection(0);
+}
+
+function showRptSection(idx){
+  document.querySelectorAll('[id^="rpt-btn-"]').forEach((b,i)=>{
+    b.style.background=i===idx?'rgba(201,168,76,.12)':'none';
+    b.style.borderLeft=i===idx?'3px solid var(--gold)':'3px solid transparent';
+  });
+  const content=document.getElementById('rpt-content');
+  if(!content)return;
+  const sec=RPT_SECTIONS[idx];
+  content.innerHTML='<div style="padding:20px 22px;color:#1a2340"><div style="display:flex;align-items:center;gap:10px;margin-bottom:6px;padding-bottom:12px;border-bottom:2px solid #f0f0f0"><span style="font-size:1.3rem">'+sec.icon+'</span><div><div style="font-family:\'Syne\',sans-serif;font-weight:800;font-size:1rem;color:#0d1117">'+sec.title+'</div><div style="font-size:.68rem;color:#888;font-family:\'DM Mono\',monospace">'+sec.tag+'</div></div><div style="margin-left:auto;background:#f0f2f8;border-radius:20px;padding:3px 10px;font-size:.62rem;color:#6677aa;font-family:\'DM Mono\',monospace;font-weight:700">'+(idx+1)+' / '+RPT_SECTIONS.length+'</div></div><div style="height:3px;background:linear-gradient(90deg,#C9A84C,rgba(201,168,76,.1));margin-bottom:16px;border-radius:2px"></div>'+sec.html+'<div style="height:20px"></div></div>';
+}
+
+
+
+// ─── DATA HOJE ───
+function getDataHoje(){
+  const d = new Date();
+  const meses = ['janeiro','fevereiro','março','abril','maio','junho',
+    'julho','agosto','setembro','outubro','novembro','dezembro'];
+  return d.getDate()+' de '+meses[d.getMonth()]+' de '+d.getFullYear();
+}
+function getCidadeHoje(){
+  const campo = document.getElementById('ct_foro');
+  const cidade = campo ? campo.value.replace('/RJ','').replace('/SP','').trim() : 'Rio de Janeiro';
+  return cidade+', '+getDataHoje();
+}
+
+// ─── EMPRESA NA CAPA ───
+function atualizarEmpresa(val){
+  const el = document.getElementById('capa-empresa-nome');
+  if(el) el.textContent = val.trim() || '—';
+  draftSave();
+}
+
+// ─── FULLSCREEN ───
+function toggleFullscreen(){
+  if(!document.fullscreenElement){
+    document.documentElement.requestFullscreen().catch(()=>{});
+    document.getElementById('btn-fs').textContent = '✕ Sair';
+  } else {
+    document.exitFullscreen();
+    document.getElementById('btn-fs').textContent = '⛶';
+  }
+}
+document.addEventListener('fullscreenchange',()=>{
+  const btn = document.getElementById('btn-fs');
+  if(btn) btn.textContent = document.fullscreenElement ? '✕ Sair' : '⛶';
+});
+document.addEventListener('keydown', e => {
+  if(e.key === 'F11'){ e.preventDefault(); toggleFullscreen(); }
+});
+
+// ─── TIMER COUNTDOWN ───
+function updateCountdown(remaining){
+  const el = document.getElementById('timer-countdown');
+  if(!el) return;
+  if(!autoOn || remaining <= 0){ el.textContent=''; return; }
+  const s = Math.ceil(remaining/1000);
+  el.textContent = s+'s';
+  el.className = 'timer-countdown' + (s <= 5 ? ' urgent' : '');
+}
+
+// Patch resetTimer to also update countdown
+// countdown overlay on resetTimer
+const _origResetTimer = resetTimer;
+// Countdown: managed via toggleAuto, not resetTimer override
+
+// ─── PHONE MASK ───
+function maskPhone(el){
+  let v = el.value.replace(/\D/g,'').slice(0,11);
+  if(v.length <= 10) v = v.replace(/(\d{2})(\d{4})(\d{0,4})/,'($1) $2-$3');
+  else v = v.replace(/(\d{2})(\d{5})(\d{0,4})/,'($1) $2-$3');
+  el.value = v.replace(/-$/,'');
+}
+
+// ─── AUTO DRAFT SAVE (localStorage) ───
+const DRAFT_KEY = 'pbsmart_draft_v1';
+let draftTimer = null;
+let draftSaving = false;
+
+const DRAFT_FIELDS = [
+  'ct_nome','ct_cnpj','ct_regime','ct_endereco','ct_resp','ct_cpf',
+  'ct_telefone','ct_email',
+  'ct_escritorio','ct_cnpj_esc','ct_crc','ct_endereco_esc','ct_consultor',
+  'ct_objeto','ct_faixa','ct_parcelas','ct_valor','ct_prazo',
+  'ct_foro','ct_cidade_field',
+  'capa-empresa-input',
+  'sim_fat','sim_regime','sim_setor'
+];
+
+function draftSave(){
+  clearTimeout(draftTimer);
+  // Show saving indicator
+  const dot = document.getElementById('autosave-dot');
+  const lbl = document.getElementById('autosave-lbl');
+  if(dot){ dot.className=''; dot.id='autosave-dot'; dot.classList.add('saving'); }
+
+  draftTimer = setTimeout(()=>{
+    try{
+      const data = { ts: Date.now(), empresa: '' };
+      DRAFT_FIELDS.forEach(id => {
+        const el = document.getElementById(id);
+        if(el) data[id] = el.tagName==='SELECT' ? el.value : el.value;
+      });
+      data.empresa = (document.getElementById('capa-empresa-input')||{}).value || '';
+      localStorage.setItem(DRAFT_KEY, JSON.stringify(data));
+      if(dot){ dot.classList.remove('saving'); dot.classList.add('saved'); }
+      if(lbl) lbl.textContent = 'salvo';
+      setTimeout(()=>{ if(lbl) lbl.textContent=''; }, 2000);
+    } catch(e){ console.warn('Draft save failed:', e); }
+  }, 800);
+}
+
+function draftLoad(){
+  try{
+    const raw = localStorage.getItem(DRAFT_KEY);
+    if(!raw) return;
+    const data = JSON.parse(raw);
+    // Check if there's any meaningful data
+    const hasData = DRAFT_FIELDS.some(id => id !== 'ct_foro' && data[id] && data[id].trim && data[id].trim());
+    if(!hasData) return;
+    // Show banner
+    const banner = document.getElementById('draft-banner');
+    const info = document.getElementById('draft-info');
+    if(banner){
+      const d = new Date(data.ts);
+      const diff = Math.round((Date.now()-data.ts)/60000);
+      const timeStr = diff < 60 ? diff+'min atrás' : Math.round(diff/60)+'h atrás';
+      if(info) info.textContent = (data.empresa||'dados salvos')+' · '+timeStr;
+      banner.classList.add('show');
+    }
+  } catch(e){}
+}
+
+function restoreDraft(){
+  try{
+    const raw = localStorage.getItem(DRAFT_KEY);
+    if(!raw) return;
+    const data = JSON.parse(raw);
+    DRAFT_FIELDS.forEach(id => {
+      const el = document.getElementById(id);
+      if(el && data[id] !== undefined) el.value = data[id];
+    });
+    // Restore empresa on capa
+    const emp = data.empresa || data['capa-empresa-input'] || '';
+    if(emp) atualizarEmpresa(emp);
+    // Trigger calculations
+    if(data.ct_faixa) ctSetValor();
+    if(data.sim_fat || data.sim_regime || data.sim_setor) simCalc();
+    document.getElementById('draft-banner').classList.remove('show');
+    // Show success
+    const dot = document.getElementById('autosave-dot');
+    const lbl = document.getElementById('autosave-lbl');
+    if(dot) dot.classList.add('saved');
+    if(lbl){ lbl.textContent = 'restaurado ✓'; setTimeout(()=>lbl.textContent='',3000); }
+  } catch(e){ console.warn('Restore failed:',e); }
+}
+
+function discardDraft(){
+  try{ localStorage.removeItem(DRAFT_KEY); } catch(e){}
+  document.getElementById('draft-banner').classList.remove('show');
+}
+
+function attachDraftListeners(){
+  DRAFT_FIELDS.forEach(id => {
+    const el = document.getElementById(id);
+    if(el) el.addEventListener('input', draftSave);
+    if(el && el.tagName==='SELECT') el.addEventListener('change', draftSave);
+  });
+}
+
+// ─── INIT ───
+initDots(); updateUI();
+
+// Data de hoje no campo de cidade/data
+(function(){
+  const el = document.getElementById('ct_cidade_field');
+  if(el && !el.value) el.value = getCidadeHoje();
+})();
+
+// Attach draft auto-save listeners
+setTimeout(attachDraftListeners, 500);
+
+// Check for saved draft on load
+setTimeout(draftLoad, 600);
+
+// Keyboard shortcut: F = fullscreen
+document.addEventListener('keydown', e => {
+  if(document.activeElement && ['INPUT','SELECT','TEXTAREA'].includes(document.activeElement.tagName)) return;
+  if(e.key === 'f' || e.key === 'F') toggleFullscreen();
+});
+</script>
+<!-- Área exclusiva para impressão -->
+<div id="print-contract-area" style="display:none"></div>
+</body>
+</html>

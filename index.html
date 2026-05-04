@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
@@ -345,10 +346,14 @@ select.f-input option{background:var(--bg3)}
 .btn-fs:hover{border-color:var(--accent);color:var(--accent)}
 
 /* DRAFT BANNER */
-#draft-banner{display:none;position:fixed;top:8px;left:50%;transform:translateX(-50%);
-  z-index:500;background:linear-gradient(135deg,rgba(201,168,76,.15),rgba(0,229,255,.08));
+#draft-banner{
+  display:none;
+  position:fixed;top:8px;left:50%;transform:translateX(-50%);
+  z-index:9999;
+  background:linear-gradient(135deg,rgba(201,168,76,.15),rgba(0,229,255,.08));
   border:1px solid rgba(201,168,76,.4);border-radius:10px;padding:10px 18px;
-  backdrop-filter:blur(10px);display:flex;align-items:center;gap:12px;
+  backdrop-filter:blur(10px);
+  align-items:center;gap:12px;
   font-size:.78rem;color:var(--text);box-shadow:0 4px 24px rgba(0,0,0,.4)}
 #draft-banner.show{display:flex}
 .draft-btn{padding:5px 12px;border-radius:6px;font-family:'Syne',sans-serif;
@@ -1912,11 +1917,11 @@ function draftLoad(){
     const banner = document.getElementById('draft-banner');
     const info = document.getElementById('draft-info');
     if(banner){
-      const d = new Date(data.ts);
       const diff = Math.round((Date.now()-data.ts)/60000);
-      const timeStr = diff < 60 ? diff+'min atrás' : Math.round(diff/60)+'h atrás';
-      if(info) info.textContent = (data.empresa||'dados salvos')+' · '+timeStr;
-      banner.classList.add('show');
+      const timeStr = diff < 1 ? 'agora mesmo' : diff < 60 ? diff+'min atrás' : Math.round(diff/60)+'h atrás';
+      const nomeEmp = data.empresa || data['capa-empresa-input'] || 'dados salvos';
+      if(info) info.textContent = nomeEmp + ' · ' + timeStr;
+      banner.style.display = 'flex';
     }
   } catch(e){}
 }
@@ -1924,30 +1929,47 @@ function draftLoad(){
 function restoreDraft(){
   try{
     const raw = localStorage.getItem(DRAFT_KEY);
-    if(!raw) return;
+    if(!raw){ alert('Nenhum rascunho encontrado.'); return; }
     const data = JSON.parse(raw);
+    // Restore all fields
     DRAFT_FIELDS.forEach(id => {
       const el = document.getElementById(id);
-      if(el && data[id] !== undefined) el.value = data[id];
+      if(!el || data[id] === undefined) return;
+      el.value = data[id];
+      // Trigger change for selects
+      if(el.tagName === 'SELECT') el.dispatchEvent(new Event('change'));
     });
-    // Restore empresa on capa
+    // Restore empresa na capa
     const emp = data.empresa || data['capa-empresa-input'] || '';
-    if(emp) atualizarEmpresa(emp);
-    // Trigger calculations
-    if(data.ct_faixa) ctSetValor();
-    if(data.sim_fat || data.sim_regime || data.sim_setor) simCalc();
-    document.getElementById('draft-banner').classList.remove('show');
-    // Show success
+    if(emp){ 
+      const inp = document.getElementById('capa-empresa-input');
+      if(inp) inp.value = emp;
+      atualizarEmpresa(emp);
+    }
+    // Trigger calculations after restore
+    setTimeout(()=>{
+      ctSetValor();
+      ctCalcParcela();
+      simCalc();
+    }, 100);
+    // Hide banner
+    const banner = document.getElementById('draft-banner');
+    if(banner) banner.style.display = 'none';
+    // Show success indicator
     const dot = document.getElementById('autosave-dot');
     const lbl = document.getElementById('autosave-lbl');
-    if(dot) dot.classList.add('saved');
-    if(lbl){ lbl.textContent = 'restaurado ✓'; setTimeout(()=>lbl.textContent='',3000); }
-  } catch(e){ console.warn('Restore failed:',e); }
+    if(dot){ dot.className=''; dot.id='autosave-dot'; dot.classList.add('saved'); }
+    if(lbl){ lbl.textContent = 'restaurado ✓'; setTimeout(()=>{ lbl.textContent=''; },3000); }
+  } catch(e){ 
+    console.warn('Restore failed:',e);
+    alert('Erro ao restaurar rascunho. Tente novamente.');
+  }
 }
 
 function discardDraft(){
   try{ localStorage.removeItem(DRAFT_KEY); } catch(e){}
-  document.getElementById('draft-banner').classList.remove('show');
+  const banner = document.getElementById('draft-banner');
+  if(banner) banner.style.display = 'none';
 }
 
 function attachDraftListeners(){

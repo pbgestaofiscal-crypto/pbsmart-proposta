@@ -1,5 +1,4 @@
-
-<!DOCTYPE html>
+ <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
 <meta charset="UTF-8">
@@ -378,16 +377,105 @@ select.f-input option{background:var(--bg3)}
 
 /* MOBILE ADJUSTMENTS */
 @media(max-width:768px){
-  .slide-inner{padding:20px 18px 80px}
-  .preview-split{grid-template-columns:1fr!important}
-  .doc-col{height:400px}
-  .navbar{padding:10px 14px}
+  /* SLIDE INNER — padding bottom maior para não ficar atrás da navbar */
+  .slide-inner{padding:16px 16px 100px!important}
+
+  /* NAVBAR — maior, mais fácil de tocar */
+  .navbar{
+    padding:10px 12px!important;
+    height:60px;
+    gap:6px;
+  }
   .nb-brand{display:none}
+  .nb-counter{font-size:.65rem}
+  .dots{gap:5px}
+  .dot{width:6px;height:6px}
+  .dot.active{width:18px}
+
+  /* BOTÕES DA NAVBAR — maiores para toque */
+  .nb-btns{gap:6px!important}
+  .btn{padding:8px 14px!important;font-size:.78rem!important}
+  .btn-ghost{padding:7px 10px!important;font-size:.7rem!important}
+  .btn-fs{display:none}
+  #btn-auto{display:none}
+  .timer-countdown{display:none}
+  #autosave-lbl{display:none}
+
+  /* GRIDS — coluna única */
   .g2,.g3,.g4{grid-template-columns:1fr!important}
-  .capa{padding:24px 18px}
-  .capa-h{font-size:1.4rem}
-  #capa-empresa-input{width:100%}
-  .ct-action-bar{flex-direction:column}
+
+  /* CAPA */
+  .capa{padding:20px 16px 110px!important}
+  .capa-h{font-size:1.3rem!important}
+  .capa-p{font-size:.85rem}
+  .capa-threat{grid-template-columns:1fr!important;gap:10px!important}
+  #capa-empresa-input{width:100%!important}
+
+  /* CONTRATO */
+  .preview-split{grid-template-columns:1fr!important;height:auto!important}
+  .doc-col{height:350px;margin-top:12px}
+  .ct-action-bar{flex-direction:column!important}
+  .ct-action-btn{font-size:.8rem!important}
+
+  /* RELATÓRIO */
+  #rpt-menu{display:none}
+  .slide-inner > div[style*="grid-template-columns:260px"]{
+    grid-template-columns:1fr!important
+  }
+
+  /* SIMULADOR */
+  .sim-box{padding:14px!important}
+  .sim-val{font-size:1.4rem!important}
+
+  /* TABELAS — scroll horizontal */
+  table{display:block;overflow-x:auto;white-space:nowrap}
+
+  /* TEXTOS */
+  .h1{font-size:1.4rem!important}
+  .h2{font-size:1.2rem!important}
+  .sub{font-size:.82rem!important}
+
+  /* PRICE TABLE */
+  .price-table td,.price-table th{padding:8px 10px!important}
+
+  /* DRAFT BANNER */
+  #draft-banner{
+    width:90vw!important;
+    flex-wrap:wrap!important;
+    top:auto!important;
+    bottom:70px!important;
+    left:50%!important;
+    transform:translateX(-50%)!important;
+    font-size:.72rem!important;
+  }
+
+  /* SWIPE HINT */
+  .swipe-hint{display:flex!important}
+}
+
+/* SWIPE HINT — só mobile */
+.swipe-hint{
+  display:none;
+  position:fixed;
+  bottom:68px;
+  left:50%;
+  transform:translateX(-50%);
+  background:rgba(201,168,76,.15);
+  border:1px solid rgba(201,168,76,.3);
+  border-radius:20px;
+  padding:5px 14px;
+  font-size:.68rem;
+  color:var(--gold);
+  font-family:'DM Mono',monospace;
+  pointer-events:none;
+  z-index:150;
+  animation:fadeSwipe 3s ease forwards;
+}
+@keyframes fadeSwipe{
+  0%{opacity:0;transform:translateX(-50%) translateY(6px)}
+  20%{opacity:1;transform:translateX(-50%) translateY(0)}
+  80%{opacity:1}
+  100%{opacity:0;transform:translateX(-50%) translateY(-4px)}
 }
 </style>
 </head>
@@ -1007,7 +1095,7 @@ function go(n){
   SLIDES[cur].classList.add('out');
   const prev=cur; setTimeout(()=>SLIDES[prev].classList.remove('out'),550);
   cur=n; SLIDES[cur].classList.add('active'); updateUI(); resetTimer();
-  if(n===3) setTimeout(buildRptMenu,80);
+  if(n===3){ setTimeout(buildRptMenu,80); setTimeout(fixRptMobile,150); }
 }
 function next(){go(cur===N-1?0:cur+1);}
 function prev(){go(cur-1);}
@@ -1777,6 +1865,18 @@ const RPT_SECTIONS = [
   }
 ];
 
+function fixRptMobile(){
+  if(window.innerWidth > 768) return;
+  // On mobile, hide sidebar and show content full width
+  const grid = document.querySelector('#s5 .slide-inner > div[style*="grid-template-columns:260px"]');
+  if(grid) grid.style.gridTemplateColumns = '1fr';
+  const menu = document.getElementById('rpt-menu');
+  if(menu && menu.parentElement) menu.parentElement.style.display = 'none';
+  // Show section selector instead
+  const sel = document.getElementById('rpt-mobile-select');
+  if(sel) sel.style.display = 'block';
+}
+
 function buildRptMenu(){
   const menu=document.getElementById('rpt-menu');
   if(!menu)return;
@@ -1979,6 +2079,46 @@ function attachDraftListeners(){
     if(el && el.tagName==='SELECT') el.addEventListener('change', draftSave);
   });
 }
+
+// ─── SWIPE GESTURE (mobile) ───
+(function(){
+  let startX=0, startY=0, moved=false;
+  const wrap = document.getElementById('wrap');
+  if(!wrap) return;
+
+  wrap.addEventListener('touchstart', e=>{
+    startX = e.touches[0].clientX;
+    startY = e.touches[0].clientY;
+    moved = false;
+  }, {passive:true});
+
+  wrap.addEventListener('touchend', e=>{
+    if(moved) return;
+    const dx = e.changedTouches[0].clientX - startX;
+    const dy = Math.abs(e.changedTouches[0].clientY - startY);
+    // Only swipe if mostly horizontal and more than 50px
+    if(Math.abs(dx) > 50 && dy < 80){
+      if(dx < 0) next();   // swipe left = próximo
+      else prev();          // swipe right = voltar
+    }
+  }, {passive:true});
+
+  wrap.addEventListener('touchmove', e=>{
+    const dy = Math.abs(e.touches[0].clientY - startY);
+    const dx = Math.abs(e.touches[0].clientX - startX);
+    if(dy > dx) moved = true; // vertical scroll, ignore swipe
+  }, {passive:true});
+})();
+
+// ─── SWIPE HINT (mobile only) ───
+(function(){
+  if(window.innerWidth > 768) return;
+  const hint = document.createElement('div');
+  hint.className = 'swipe-hint';
+  hint.textContent = '← deslize para navegar →';
+  document.body.appendChild(hint);
+  setTimeout(()=>hint.remove(), 3500);
+})();
 
 // ─── INIT ───
 initDots(); updateUI();
